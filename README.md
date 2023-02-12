@@ -38,6 +38,7 @@ $ gh extension install k1LoW/gh-grep
         # os: linux
         # arch: amd64
         # force: true
+        # gh-setup-version: latest
         env:
           GITHUB_TOKEN: ${secrets.GITHUB_TOKEN}
       -
