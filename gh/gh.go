@@ -81,8 +81,11 @@ func GetReleaseAsset(ctx context.Context, owner, repo string, opt *AssetOption) 
 
 func detectAsset(assets []*github.ReleaseAsset, opt *AssetOption) (*github.ReleaseAsset, error) {
 	var (
-		od, ad *regexp.Regexp
+		od, ad, om *regexp.Regexp
 	)
+	if opt != nil && opt.Match != "" {
+		om = regexp.MustCompile(opt.Match)
+	}
 	if opt != nil && opt.OS != "" {
 		od = getDictRegexp(opt.OS, osDict)
 	} else {
@@ -100,6 +103,9 @@ func detectAsset(assets []*github.ReleaseAsset, opt *AssetOption) (*github.Relea
 	}
 	assetScores := []*assetScore{}
 	for _, a := range assets {
+		if om != nil && om.MatchString(a.GetName()) {
+			return a, nil
+		}
 		if !contains(supportContentType, a.GetContentType()) {
 			continue
 		}
