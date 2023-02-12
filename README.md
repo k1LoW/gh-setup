@@ -2,7 +2,7 @@
 
 :octocat: Setup asset of Github Releases.
 
-## :octocat: As a GitHub CLI extension
+## As a GitHub CLI extension
 
 ### Usage
 
@@ -21,7 +21,7 @@ $ tbls version
 $ gh extension install k1LoW/gh-grep
 ```
 
-## :octocat: As a GitHub Action
+## As a GitHub Action
 
 ### Usage
 
