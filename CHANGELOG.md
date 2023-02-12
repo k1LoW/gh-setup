@@ -1,5 +1,10 @@
 # Changelog
 
+## [v0.2.0](https://github.com/k1LoW/gh-setup/compare/v0.1.1...v0.2.0) - 2023-02-12
+- Update action.yml by @k1LoW in https://github.com/k1LoW/gh-setup/pull/9
+- Update README.md by @k1LoW in https://github.com/k1LoW/gh-setup/pull/10
+- Add `--match` option by @k1LoW in https://github.com/k1LoW/gh-setup/pull/12
+
 ## [v0.1.1](https://github.com/k1LoW/gh-setup/compare/v0.1.0...v0.1.1) - 2023-02-12
 
 ## [v0.1.0](https://github.com/k1LoW/gh-setup/compare/v0.0.3...v0.1.0) - 2023-02-12
