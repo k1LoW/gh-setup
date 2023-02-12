@@ -32,6 +32,10 @@ inputs:
     description: "Enable force setup"
     default: ""
     required: false
+  gh-setup-version:
+    description: "Version of gh-setup"
+    default: "v0.3.0"
+    required: false
 runs:
   using: "composite"
   steps:
@@ -41,6 +45,7 @@ runs:
       shell: bash
       env:
         GH_SETUP_GITHUB_TOKEN: ${{ inputs.github-token }}
+        GH_SETUP_GH_SETUP_VERSION: ${{ inputs.gh-setup-version }}
     -
       run: scripts/run-gh-setup.sh
       shell: bash

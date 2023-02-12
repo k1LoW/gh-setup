@@ -32,5 +32,5 @@
 [tagpr]
 	vPrefix = true
 	releaseBranch = main
-	versionFile = version/version.go
+	versionFile = version/version.go,action.yml
 	command = "make prerelease_for_tagpr"

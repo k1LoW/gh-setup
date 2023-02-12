@@ -6,7 +6,13 @@ if [ -z "${token}" ]; then
   token=${GITHUB_TOKEN}
 fi
 repo="k1LoW/gh-setup"
-tag="$(curl -sL -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${token}" https://api.github.com/repos/${repo}/releases/latest | grep tag_name | awk -F':' '{print $2}' | awk -F'\"' '{print $2}')"
+tag=${GH_SETUP_GH_SETUP_VERSION}
+if [ -z "${tag}" ]; then
+    tag="$(curl -sL -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${token}" https://api.github.com/repos/${repo}/releases/latest | grep tag_name | awk -F':' '{print $2}' | awk -F'\"' '{print $2}')"
+fi
+if [[ "${tag}" == "latest" ]]; then
+    tag="$(curl -sL -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${token}" https://api.github.com/repos/${repo}/releases/latest | grep tag_name | awk -F':' '{print $2}' | awk -F'\"' '{print $2}')"
+fi
 arch="$(uname -m)"
 
 if uname -a | grep Msys > /dev/null; then
