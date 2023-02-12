@@ -1,0 +1,36 @@
+name: 'Setup asset of Github Releases'
+description: 'GitHub Action for gh-setup'
+inputs:
+  github-token:
+    description: The GitHub token
+    default: ${{ github.token }}
+    required: false
+  repo:
+    description: "Target repository [OWNER/REPO]"
+    required: true
+  bin-dir:
+    description: "Executable path"
+    default: ""
+    required: false
+  force:
+    description: "Enable force setup"
+    default: false
+    required: false
+runs:
+  using: "composite"
+  steps:
+    -
+      id: install-gh-setup
+      run: scripts/install-gh-setup.sh
+      shell: bash
+      env:
+        GH_SETUP_GITHUB_TOKEN: ${{ inputs.github-token }}
+    -
+      run: scripts/run-gh-setup.sh
+      shell: bash
+      env:
+        GH_SETUP_GITHUB_TOKEN: ${{ inputs.github-token }}
+        GH_SETUP_REPO: ${{ inputs.repo }}
+        GH_SETUP_BIN_DIR: ${{ inputs.bin-dir }}
+        GH_SETUP_FORCE: ${{ inputs.force }}
+        GH_SETUP_BIN: ${{ steps.install-gh-setup.outputs.bin }}
