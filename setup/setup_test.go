@@ -16,7 +16,7 @@ func TestSortPaths(t *testing.T) {
 	}{
 		{
 			[]string{"/opt/homebrew/bin", "/usr/local/bin", "/usr/local/sbin", "/usr/bin", "/usr/sbin", "/Users/k1low/.local/bin"},
-			[]string{"/Users/k1low/.local/bin", "/usr/local/bin", "/usr/bin", "/usr/local/sbin", "/usr/sbin"},
+			[]string{"/Users/k1low/.local/bin", "/usr/local/bin", "/usr/bin"},
 		},
 	}
 	for _, tt := range tests {
