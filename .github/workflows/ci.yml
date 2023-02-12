@@ -59,6 +59,7 @@ jobs:
         uses: ./
         with:
           repo: k1LoW/tbls
+          force: true
 
       - name: Run setup as a action (2/2)
         run: tbls version
