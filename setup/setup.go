@@ -10,10 +10,11 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/h2non/filetype"
 )
 
 func Bin(fsys fs.FS, bd string, force bool) (map[string]string, error) {
-	const binaryContentType = "application/octet-stream"
 	var err error
 	m := map[string]string{}
 	if bd == "" {
@@ -33,8 +34,8 @@ func Bin(fsys fs.FS, bd string, force bool) (map[string]string, error) {
 		if err != nil {
 			return err
 		}
-		contentType := http.DetectContentType(b)
-		if contentType == binaryContentType {
+
+		if isBinary(b) {
 			perm := "0755"
 			perm32, err := strconv.ParseUint(perm, 8, 32)
 			if err != nil {
@@ -57,7 +58,22 @@ func Bin(fsys fs.FS, bd string, force bool) (map[string]string, error) {
 }
 
 var priorityPaths = []string{"/usr/local/bin", "/usr/bin"}
-var ignoreKeywords = []string{"homebrew", "asdf", "X11", "/usr/local/opt", "sbin", "perl", "git", "go/bin"}
+var ignoreKeywords = []string{
+	"homebrew",
+	"X11",
+	"/usr/local/opt",
+	"sbin",
+	"perl",
+	"git",
+	"/go/",
+	".asdf",
+	".cargo",
+	".dotnet",
+	".ghcup",
+	".yarn",
+	"/Library/",
+	"hostedtoolcache",
+}
 
 func binDir() (string, error) {
 	if os.Getenv("PATH") == "" {
@@ -88,7 +104,7 @@ func sortPaths(paths []string) ([]string, error) {
 L:
 	for _, p := range paths {
 		for _, i := range ignoreKeywords {
-			if strings.Contains(strings.ToLower(p), strings.ToLower(i)) {
+			if strings.Contains(filepath.ToSlash(strings.ToLower(p)), filepath.ToSlash(strings.ToLower(i))) {
 				continue L
 			}
 		}
@@ -124,4 +140,21 @@ func hasPrefixes(in string, ps []string) int {
 		}
 	}
 	return -1
+}
+
+func isBinary(b []byte) bool {
+	// FIXME: On Windows, it can't be detected at all.
+	const binaryContentType = "application/octet-stream"
+	contentType := http.DetectContentType(b)
+	if contentType == binaryContentType {
+		return true
+	}
+	typ, err := filetype.Match(b)
+	if err != nil {
+		return false
+	}
+	if typ == filetype.Unknown {
+		return true
+	}
+	return false
 }

@@ -23,6 +23,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/k1LoW/gh-setup/gh"
@@ -56,6 +57,9 @@ var rootCmd = &cobra.Command{
 		m, err := setup.Bin(fsys, binDir, force)
 		if err != nil {
 			return err
+		}
+		if len(m) == 0 {
+			return fmt.Errorf("setup failed: %s", a.GetName())
 		}
 		cmd.Println("Setup binaries to executable path (PATH):")
 		for b, bp := range m {
