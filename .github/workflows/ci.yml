@@ -53,5 +53,13 @@ jobs:
         run: |
           go run cmd/gh-setup/main.go --repo k1LoW/gh-setup
           gh-setup -v
+        shell: bash
 
+      - name: Run setup as a action (1/2)
+        uses: ./
+        with:
+          repo: k1LoW/tbls
+
+      - name: Run setup as a action (2/2)
+        run: tbls version
         shell: bash

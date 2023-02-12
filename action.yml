@@ -1,6 +1,6 @@
 name: 'Setup asset of Github Releases'
 description: 'GitHub Action for gh-setup'
-outputs:
+inputs:
   github-token:
     description: The GitHub token
     default: ${{ github.token }}
