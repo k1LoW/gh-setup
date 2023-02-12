@@ -24,6 +24,10 @@ inputs:
     description: "Specify arch of asset"
     default: ""
     required: false
+  match:
+    description: "Match string for asset"
+    default: ""
+    required: false
   force:
     description: "Enable force setup"
     default: ""
