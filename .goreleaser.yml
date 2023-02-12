@@ -1,0 +1,91 @@
+before:
+  hooks:
+    - go mod download
+    - go mod tidy
+builds:
+-
+  id: gh-setup-linux
+  env:
+    - CGO_ENABLED=0
+  goos:
+    - linux
+  goarch:
+    - amd64
+  ldflags:
+    - -s -w -X github.com/k1LoW/gh-setup.version={{.Version}} -X github.com/k1LoW/gh-setup.commit={{.FullCommit}} -X github.com/k1LoW/gh-setup.date={{.Date}} -X github.com/k1LoW/gh-setup/version.Version={{.Version}}
+-
+  id: gh-setup-darwin
+  env:
+    - CGO_ENABLED=0
+  goos:
+    - darwin
+  goarch:
+    - amd64
+    - arm64
+  ldflags:
+    - -s -w -X github.com/k1LoW/gh-setup.version={{.Version}} -X github.com/k1LoW/gh-setup.commit={{.FullCommit}} -X github.com/k1LoW/gh-setup.date={{.Date}} -X github.com/k1LoW/gh-setup/version.Version={{.Version}}
+-
+  id: gh-setup-windows
+  env:
+    - CGO_ENABLED=0
+  goos:
+    - windows
+  goarch:
+    - amd64
+  ldflags:
+    - -s -w -X github.com/k1LoW/gh-setup.version={{.Version}} -X github.com/k1LoW/gh-setup.commit={{.FullCommit}} -X github.com/k1LoW/gh-setup.date={{.Date}} -X github.com/k1LoW/gh-setup/version.Version={{.Version}}
+archives:
+-
+  id: gh-setup-archive
+  name_template: '{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+  format_overrides:
+    - goos: darwin
+      format: zip
+  files:
+    - CREDITS
+    - README.md
+    - CHANGELOG.md
+  rlcp: true
+-
+  id: gh-setup-binary
+  name_template: '{{ .Binary }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+  format: binary
+  rlcp: true
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Version }}-next"
+changelog:
+  skip: true
+dockers:
+  -
+    goos: linux
+    goarch: amd64
+    image_templates:
+      - 'ghcr.io/k1low/gh-setup:v{{ .Version }}'
+      - 'ghcr.io/k1low/gh-setup:latest'
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - "--pull"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.name={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.source=https://github.com/k1LoW/gh-setup"
+    extra_files:
+      - scripts/entrypoint.sh
+nfpms:
+  - id: gh-setup-nfpms
+    file_name_template: "{{ .ProjectName }}_{{ .Version }}-1_{{ .Arch }}"
+    builds:
+      - gh-setup-linux
+    homepage: https://github.com/k1LoW/gh-setup
+    maintainer: Ken'ichiro Oyama <k1lowxb@gmail.com>
+    description: Setup asset of Github Releases.
+    license: MIT
+    formats:
+      - apk
+      - deb
+      - rpm
+    bindir: /usr/bin
+    epoch: 1
