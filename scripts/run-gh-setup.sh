@@ -8,6 +8,13 @@ if [ -z "${token}" ]; then
 fi
 repo=${GH_SETUP_REPO}
 bindir=${GH_SETUP_BIN_DIR}
+version=${GH_SETUP_VERSION}
+os=${GH_SETUP_OS}
+arch=${GH_SETUP_ARCH}
 force=${GH_SETUP_FORCE}
 
-${bin} --repo ${repo} --bin-dir=${GH_SETUP_BIN_DIR}
+if [ -z "${force}" ]; then
+  ${bin} --repo ${repo} --bin-dir=${bindir} --release-version=${version} --os=${os} --arch=${arch}
+else
+  ${bin} --repo ${repo} --bin-dir=${bindir} --release-version=${version} --os=${os} --arch=${arch} --force
+fi

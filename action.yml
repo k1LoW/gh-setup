@@ -12,9 +12,21 @@ inputs:
     description: "Executable path"
     default: ""
     required: false
+  version:
+    description: "Release version"
+    default: ""
+    required: false
+  os:
+    description: "Specify OS of asset"
+    default: ""
+    required: false
+  arch:
+    description: "Specify arch of asset"
+    default: ""
+    required: false
   force:
     description: "Enable force setup"
-    default: false
+    default: ""
     required: false
 runs:
   using: "composite"
@@ -32,5 +44,8 @@ runs:
         GH_SETUP_GITHUB_TOKEN: ${{ inputs.github-token }}
         GH_SETUP_REPO: ${{ inputs.repo }}
         GH_SETUP_BIN_DIR: ${{ inputs.bin-dir }}
+        GH_SETUP_VERSION: ${{ inputs.version }}
+        GH_SETUP_OS: ${{ inputs.os }}
+        GH_SETUP_ARCH: ${{ inputs.arch }}
         GH_SETUP_FORCE: ${{ inputs.force }}
         GH_SETUP_BIN: ${{ steps.install-gh-setup.outputs.bin }}
