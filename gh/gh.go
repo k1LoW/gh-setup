@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/cli/go-gh"
+	"github.com/cli/go-gh/pkg/api"
 	"github.com/google/go-github/v50/github"
 	"github.com/k1LoW/go-github-client/v50/factory"
 	"github.com/nlepage/go-tarfs"
@@ -70,7 +71,7 @@ func GetReleaseAsset(ctx context.Context, owner, repo string, opt *AssetOption) 
 	if err != nil {
 		return nil, nil, err
 	}
-	fsys, err := makeFS(repo, a)
+	fsys, err := makeFS(owner, repo, a)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -135,12 +136,18 @@ func getDictRegexp(key string, dict map[string][]string) *regexp.Regexp {
 	return regexp.MustCompile(fmt.Sprintf("(?i)(%s)", strings.ToLower(key)))
 }
 
-func makeFS(repo string, a *github.ReleaseAsset) (fs.FS, error) {
-	client, err := gh.HTTPClient(nil)
+func makeFS(owner, repo string, a *github.ReleaseAsset) (fs.FS, error) {
+	client, err := gh.HTTPClient(&api.ClientOptions{
+		Headers: map[string]string{
+			"Accept": "application/octet-stream",
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
-	resp, err := client.Get(a.GetBrowserDownloadURL())
+	_, v3ep, _, _ := factory.GetTokenAndEndpoints()
+	u := fmt.Sprintf("%s/repos/%s/%s/releases/assets/%d", v3ep, owner, repo, a.GetID())
+	resp, err := client.Get(u)
 	if err != nil {
 		return nil, err
 	}
