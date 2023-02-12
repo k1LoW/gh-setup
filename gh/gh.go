@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -120,6 +121,10 @@ func detectAsset(assets []*github.ReleaseAsset, opt *AssetOption) (*github.Relea
 			as.score += 1
 		}
 	}
+	if len(assetScores) == 0 {
+		return nil, errors.New("assets not found")
+	}
+
 	sort.Slice(assetScores, func(i, j int) bool {
 		return assetScores[i].score > assetScores[j].score
 	})
