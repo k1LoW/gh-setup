@@ -85,4 +85,5 @@ func init() {
 	rootCmd.Flags().StringVarP(&opt.Version, "release-version", "V", "", "release version")
 	rootCmd.Flags().StringVarP(&opt.OS, "os", "O", "", "specify OS of asset")
 	rootCmd.Flags().StringVarP(&opt.Arch, "arch", "A", "", "specify arch of asset")
+	rootCmd.Flags().StringVarP(&opt.Match, "match", "A", "", "match string for asset")
 }
