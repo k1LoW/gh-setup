@@ -27,6 +27,7 @@ import (
 
 	"github.com/k1LoW/gh-setup/gh"
 	"github.com/k1LoW/gh-setup/setup"
+	"github.com/k1LoW/gh-setup/version"
 	"github.com/spf13/cobra"
 )
 
@@ -37,9 +38,10 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "gh-setup",
-	Short: "Setup asset of Github Releases",
-	Long:  `Setup asset of Github Releases.`,
+	Use:     "gh-setup",
+	Short:   "Setup asset of Github Releases",
+	Long:    `Setup asset of Github Releases.`,
+	Version: version.Version,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := context.Background()
 		owner, repo, err := gh.DetectOwnerRepo(ownerrepo)
