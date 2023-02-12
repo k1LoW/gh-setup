@@ -1,5 +1,7 @@
 # Changelog
 
+## [v0.0.3](https://github.com/k1LoW/gh-setup/compare/v0.0.2...v0.0.3) - 2023-02-12
+
 ## [v0.0.2](https://github.com/k1LoW/gh-setup/compare/v0.0.1...v0.0.2) - 2023-02-12
 - Setup tagpr by @k1LoW in https://github.com/k1LoW/gh-setup/pull/1
 
