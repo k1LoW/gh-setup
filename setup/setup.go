@@ -10,10 +10,11 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/h2non/filetype"
 )
 
 func Bin(fsys fs.FS, bd string, force bool) (map[string]string, error) {
-	const binaryContentType = "application/octet-stream"
 	var err error
 	m := map[string]string{}
 	if bd == "" {
@@ -33,8 +34,8 @@ func Bin(fsys fs.FS, bd string, force bool) (map[string]string, error) {
 		if err != nil {
 			return err
 		}
-		contentType := http.DetectContentType(b)
-		if contentType == binaryContentType {
+
+		if isBinary(b) {
 			perm := "0755"
 			perm32, err := strconv.ParseUint(perm, 8, 32)
 			if err != nil {
@@ -124,4 +125,20 @@ func hasPrefixes(in string, ps []string) int {
 		}
 	}
 	return -1
+}
+
+func isBinary(b []byte) bool {
+	const binaryContentType = "application/octet-stream"
+	contentType := http.DetectContentType(b)
+	if contentType == binaryContentType {
+		return true
+	}
+	typ, err := filetype.Match(b)
+	if err != nil {
+		return false
+	}
+	if typ == filetype.Unknown {
+		return true
+	}
+	return false
 }
