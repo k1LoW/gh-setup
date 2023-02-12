@@ -11,6 +11,7 @@ builds:
     - linux
   goarch:
     - amd64
+  main: ./cmd/gh-setup/main.go
   ldflags:
     - -s -w -X github.com/k1LoW/gh-setup.version={{.Version}} -X github.com/k1LoW/gh-setup.commit={{.FullCommit}} -X github.com/k1LoW/gh-setup.date={{.Date}} -X github.com/k1LoW/gh-setup/version.Version={{.Version}}
 -
@@ -22,6 +23,7 @@ builds:
   goarch:
     - amd64
     - arm64
+  main: ./cmd/gh-setup/main.go
   ldflags:
     - -s -w -X github.com/k1LoW/gh-setup.version={{.Version}} -X github.com/k1LoW/gh-setup.commit={{.FullCommit}} -X github.com/k1LoW/gh-setup.date={{.Date}} -X github.com/k1LoW/gh-setup/version.Version={{.Version}}
 -
@@ -32,6 +34,7 @@ builds:
     - windows
   goarch:
     - amd64
+  main: ./cmd/gh-setup/main.go
   ldflags:
     - -s -w -X github.com/k1LoW/gh-setup.version={{.Version}} -X github.com/k1LoW/gh-setup.commit={{.FullCommit}} -X github.com/k1LoW/gh-setup.date={{.Date}} -X github.com/k1LoW/gh-setup/version.Version={{.Version}}
 archives:
