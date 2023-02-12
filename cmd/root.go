@@ -23,6 +23,7 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 
@@ -51,6 +52,12 @@ var rootCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		if opt != nil && opt.Match != "" {
+			if opt.OS != "" || opt.Arch != "" {
+				return errors.New("--match and --os/--arch options cannot be used together")
+			}
+		}
+
 		a, fsys, err := gh.GetReleaseAsset(ctx, owner, repo, opt)
 		if err != nil {
 			return err
