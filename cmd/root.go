@@ -38,6 +38,8 @@ var (
 	force     bool
 )
 
+var opt = &gh.AssetOption{}
+
 var rootCmd = &cobra.Command{
 	Use:     "gh-setup",
 	Short:   "Setup asset of Github Releases",
@@ -49,7 +51,7 @@ var rootCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		a, fsys, err := gh.GetReleaseAsset(ctx, owner, repo, &gh.AssetOption{})
+		a, fsys, err := gh.GetReleaseAsset(ctx, owner, repo, opt)
 		if err != nil {
 			return err
 		}
@@ -80,4 +82,7 @@ func init() {
 	rootCmd.Flags().StringVarP(&ownerrepo, "repo", "R", "", "repository using the OWNER/REPO format")
 	rootCmd.Flags().StringVarP(&binDir, "bin-dir", "", "", "bin directory for setup")
 	rootCmd.Flags().BoolVarP(&force, "force", "f", false, "enable force setup")
+	rootCmd.Flags().StringVarP(&opt.Version, "release-version", "V", "", "release version")
+	rootCmd.Flags().StringVarP(&opt.OS, "os", "O", "", "specify OS of asset")
+	rootCmd.Flags().StringVarP(&opt.Arch, "arch", "A", "", "specify arch of asset")
 }
