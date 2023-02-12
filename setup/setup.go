@@ -58,7 +58,22 @@ func Bin(fsys fs.FS, bd string, force bool) (map[string]string, error) {
 }
 
 var priorityPaths = []string{"/usr/local/bin", "/usr/bin"}
-var ignoreKeywords = []string{"homebrew", "asdf", "X11", "/usr/local/opt", "sbin", "perl", "git", "go/bin"}
+var ignoreKeywords = []string{
+	"homebrew",
+	"X11",
+	"/usr/local/opt",
+	"sbin",
+	"perl",
+	"git",
+	"/go/",
+	".asdf",
+	".cargo",
+	".dotnet",
+	".ghcup",
+	".yarn",
+	"/Library/",
+	"hostedtoolcache",
+}
 
 func binDir() (string, error) {
 	if os.Getenv("PATH") == "" {
@@ -89,7 +104,7 @@ func sortPaths(paths []string) ([]string, error) {
 L:
 	for _, p := range paths {
 		for _, i := range ignoreKeywords {
-			if strings.Contains(strings.ToLower(p), strings.ToLower(i)) {
+			if strings.Contains(filepath.ToSlash(strings.ToLower(p)), filepath.ToSlash(strings.ToLower(i))) {
 				continue L
 			}
 		}
@@ -128,6 +143,7 @@ func hasPrefixes(in string, ps []string) int {
 }
 
 func isBinary(b []byte) bool {
+	// FIXME: On Windows, it can't be detected at all.
 	const binaryContentType = "application/octet-stream"
 	contentType := http.DetectContentType(b)
 	if contentType == binaryContentType {
