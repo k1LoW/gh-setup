@@ -31,16 +31,15 @@ $ gh extension install k1LoW/gh-grep
     steps:
       -
         name: Setup k1LoW/tbls
-        run: k1LoW/gh-setup@main
+        run: k1LoW/gh-setup@v0
         with:
+          github-token: ${secrets.GITHUB_TOKEN}
           repo: k1LoW/tbls
         # version: v1.60.0
         # os: linux
         # arch: amd64
         # force: true
         # gh-setup-version: latest
-        env:
-          GITHUB_TOKEN: ${secrets.GITHUB_TOKEN}
       -
         name: Run tbls
         run: tbls doc
