@@ -78,10 +78,10 @@ jobs:
         uses: ./
         with:
           github-token: ''
-          repo: k1LoW/runn
+          repo: k1LoW/colr
           force: true
           gh-setup-version: v0.7.0
 
       - name: Run setup as a action (no credentials) (2/2)
-        run: runn -v
+        run: colr -v
         shell: bash
