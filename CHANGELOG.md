@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.5.1](https://github.com/k1LoW/gh-setup/compare/v0.5.0...v0.5.1) - 2023-02-13
+- [BREAKING] Change API of version by @k1LoW in https://github.com/k1LoW/gh-setup/pull/26
+
 ## [v0.5.0](https://github.com/k1LoW/gh-setup/compare/v0.4.0...v0.5.0) - 2023-02-13
 - Fix README/CI by @k1LoW in https://github.com/k1LoW/gh-setup/pull/21
 - Support custom API host by @k1LoW in https://github.com/k1LoW/gh-setup/pull/23
