@@ -52,7 +52,10 @@ var rootCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		os.Setenv("GH_HOST", host) // override GH_HOST
+		// override env
+		os.Setenv("GH_HOST", host)
+		os.Unsetenv("GITHUB_API_URL")
+
 		if opt != nil && opt.Match != "" {
 			if opt.OS != "" || opt.Arch != "" {
 				return errors.New("--match and --os/--arch options cannot be used together")
