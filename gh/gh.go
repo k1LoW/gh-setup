@@ -217,22 +217,30 @@ func contains(s []string, e string) bool {
 	return false
 }
 
-func DetectOwnerRepo(ownerrepo string) (string, string, error) {
-	var owner, repo string
+func DetectHostOwnerRepo(ownerrepo string) (string, string, string, error) {
+	var host, owner, repo string
+	r, err := gh.CurrentRepository()
+	if err != nil {
+		return "", "", "", err
+	}
 	if ownerrepo == "" {
-		r, err := gh.CurrentRepository()
-		if err != nil {
-			return "", "", err
-		}
+		host = r.Host()
 		owner = r.Owner()
 		repo = r.Name()
 	} else {
 		splitted := strings.Split(ownerrepo, "/")
-		if len(splitted) != 2 {
-			return "", "", fmt.Errorf("invalid repo: %s", ownerrepo)
+		switch len(splitted) {
+		case 2:
+			host = r.Host()
+			owner = splitted[0]
+			repo = splitted[1]
+		case 3:
+			host = splitted[0]
+			owner = splitted[1]
+			repo = splitted[2]
+		default:
+			return "", "", "", fmt.Errorf("invalid repo: %s", ownerrepo)
 		}
-		owner = splitted[0]
-		repo = splitted[1]
 	}
-	return owner, repo, nil
+	return host, owner, repo, nil
 }
