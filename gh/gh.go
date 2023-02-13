@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"os"
+	"net/http"
 	"regexp"
 	"runtime"
 	"sort"
@@ -218,17 +218,18 @@ func makeFS(owner, repo string, a *github.ReleaseAsset) (fs.FS, error) {
 }
 
 func downloadAsset(owner, repo string, a *github.ReleaseAsset) ([]byte, error) {
-	client, err := gh.HTTPClient(&api.ClientOptions{
-		Headers: map[string]string{
-			"Accept": "application/octet-stream",
-		},
-	})
+	client, err := httpClient()
 	if err != nil {
 		return nil, err
 	}
 	_, v3ep, _, _ := factory.GetTokenAndEndpoints()
 	u := fmt.Sprintf("%s/repos/%s/%s/releases/assets/%d", v3ep, owner, repo, a.GetID())
-	resp, err := client.Get(u)
+	req, err := http.NewRequest(http.MethodGet, u, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Accept", "application/octet-stream")
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -252,8 +253,7 @@ func contains(s []string, e string) bool {
 func client(ctx context.Context) (*github.Client, error) {
 	token, _, _, _ := factory.GetTokenAndEndpoints()
 	if token == "" {
-		// Successful unauthenticated API call with one failed authentication instead of skipping authentication immediately.
-		os.Setenv("GITHUB_TOKEN", "gh-setup-fake-token")
+		return factory.NewGithubClient(factory.SkipAuth(true))
 	}
 	c, err := factory.NewGithubClient()
 	if err != nil {
@@ -263,4 +263,35 @@ func client(ctx context.Context) (*github.Client, error) {
 		return factory.NewGithubClient(factory.SkipAuth(true))
 	}
 	return c, nil
+}
+
+func httpClient() (*http.Client, error) {
+	token, v3ep, _, _ := factory.GetTokenAndEndpoints()
+	if token == "" {
+		return &http.Client{
+			Timeout:   30 * time.Second,
+			Transport: http.DefaultTransport.(*http.Transport).Clone(),
+		}, nil
+	}
+	client, err := gh.HTTPClient(&api.ClientOptions{})
+	if err != nil {
+		return nil, err
+	}
+	u := fmt.Sprintf("%s/user", v3ep)
+	req, err := http.NewRequest(http.MethodGet, u, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		client = &http.Client{
+			Timeout:   30 * time.Second,
+			Transport: http.DefaultTransport.(*http.Transport).Clone(),
+		}
+	}
+	return client, nil
 }
