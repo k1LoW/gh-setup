@@ -2,6 +2,8 @@
 
 :octocat: Setup asset of Github Releases.
 
+[![build](https://github.com/k1LoW/gh-setup/actions/workflows/ci.yml/badge.svg)](https://github.com/k1LoW/gh-setup/actions/workflows/ci.yml) ![Coverage](https://raw.githubusercontent.com/k1LoW/octocovs/main/badges/k1LoW/gh-setup/coverage.svg) ![Code to Test Ratio](https://raw.githubusercontent.com/k1LoW/octocovs/main/badges/k1LoW/gh-setup/ratio.svg)
+
 ## As a GitHub CLI extension
 
 ### Usage
