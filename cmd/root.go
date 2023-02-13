@@ -48,10 +48,11 @@ var rootCmd = &cobra.Command{
 	Version: version.Version,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := context.Background()
-		owner, repo, err := gh.DetectOwnerRepo(ownerrepo)
+		host, owner, repo, err := gh.DetectHostOwnerRepo(ownerrepo)
 		if err != nil {
 			return err
 		}
+		os.Setenv("GH_HOST", host) // override GH_HOST
 		if opt != nil && opt.Match != "" {
 			if opt.OS != "" || opt.Arch != "" {
 				return errors.New("--match and --os/--arch options cannot be used together")
@@ -86,7 +87,7 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.Flags().StringVarP(&ownerrepo, "repo", "R", "", "repository using the OWNER/REPO format")
+	rootCmd.Flags().StringVarP(&ownerrepo, "repo", "R", "", "repository using the [HOST/]OWNER/REPO format")
 	rootCmd.Flags().StringVarP(&binDir, "bin-dir", "", "", "bin directory for setup")
 	rootCmd.Flags().BoolVarP(&force, "force", "f", false, "enable force setup")
 	rootCmd.Flags().StringVarP(&opt.Version, "release-version", "V", "", "release version")
