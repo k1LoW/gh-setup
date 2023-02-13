@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"log"
 	"net/http"
 	"regexp"
 	"runtime"
@@ -176,6 +177,7 @@ func makeFS(owner, repo string, a *github.ReleaseAsset) (fs.FS, error) {
 	if err != nil {
 		return nil, err
 	}
+	log.Println("asset content type:", a.GetContentType())
 	switch a.GetContentType() {
 	case "application/zip", "application/x-zip-compressed":
 		return zip.NewReader(bytes.NewReader(b), int64(len(b)))
