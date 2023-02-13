@@ -51,7 +51,7 @@ jobs:
 
       - name: Run setup test
         run: |
-          go run cmd/gh-setup/main.go --repo k1LoW/gh-setup --release-version v0.4.0 --force
+          go run cmd/gh-setup/main.go --repo k1LoW/gh-setup --version v0.4.0 --force
           gh-setup -v
         shell: bash
 

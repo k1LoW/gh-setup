@@ -42,11 +42,16 @@ var (
 var opt = &gh.AssetOption{}
 
 var rootCmd = &cobra.Command{
-	Use:     "gh-setup",
-	Short:   "Setup asset of Github Releases",
-	Long:    `Setup asset of Github Releases.`,
-	Version: version.Version,
+	Use:       "gh-setup",
+	Short:     "Setup asset of Github Releases",
+	Long:      `Setup asset of Github Releases.`,
+	Args:      cobra.OnlyValidArgs,
+	ValidArgs: []string{"version"},
 	RunE: func(cmd *cobra.Command, args []string) error {
+		if len(args) > 0 {
+			cmd.Printf("gh-setup version %s\n", version.Version)
+			return nil
+		}
 		ctx := context.Background()
 		host, owner, repo, err := gh.DetectHostOwnerRepo(ownerrepo)
 		if err != nil {
@@ -93,7 +98,7 @@ func init() {
 	rootCmd.Flags().StringVarP(&ownerrepo, "repo", "R", "", "repository using the [HOST/]OWNER/REPO format")
 	rootCmd.Flags().StringVarP(&binDir, "bin-dir", "", "", "bin directory for setup")
 	rootCmd.Flags().BoolVarP(&force, "force", "f", false, "enable force setup")
-	rootCmd.Flags().StringVarP(&opt.Version, "release-version", "V", "", "release version")
+	rootCmd.Flags().StringVarP(&opt.Version, "version", "v", "", "release version")
 	rootCmd.Flags().StringVarP(&opt.OS, "os", "O", "", "specify OS of asset")
 	rootCmd.Flags().StringVarP(&opt.Arch, "arch", "A", "", "specify arch of asset")
 	rootCmd.Flags().StringVarP(&opt.Match, "match", "", "", "match string for asset")
