@@ -80,6 +80,28 @@ func GetReleaseAsset(ctx context.Context, owner, repo string, opt *AssetOption) 
 	return a, fsys, nil
 }
 
+func DetectHostOwnerRepo(ownerrepo string) (string, string, string, error) {
+	var host, owner, repo string
+	r, err := gh.CurrentRepository()
+	if err != nil {
+		return "", "", "", err
+	}
+	if ownerrepo == "" {
+		host = r.Host()
+		owner = r.Owner()
+		repo = r.Name()
+	} else {
+		r, err := repository.Parse(ownerrepo)
+		if err != nil {
+			return "", "", "", err
+		}
+		host = r.Host()
+		owner = r.Owner()
+		repo = r.Name()
+	}
+	return host, owner, repo, nil
+}
+
 func detectAsset(assets []*github.ReleaseAsset, opt *AssetOption) (*github.ReleaseAsset, error) {
 	var (
 		od, ad, om *regexp.Regexp
@@ -149,22 +171,7 @@ func getDictRegexp(key string, dict map[string][]string) *regexp.Regexp {
 }
 
 func makeFS(owner, repo string, a *github.ReleaseAsset) (fs.FS, error) {
-	client, err := gh.HTTPClient(&api.ClientOptions{
-		Headers: map[string]string{
-			"Accept": "application/octet-stream",
-		},
-	})
-	if err != nil {
-		return nil, err
-	}
-	_, v3ep, _, _ := factory.GetTokenAndEndpoints()
-	u := fmt.Sprintf("%s/repos/%s/%s/releases/assets/%d", v3ep, owner, repo, a.GetID())
-	resp, err := client.Get(u)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	b, err := io.ReadAll(resp.Body)
+	b, err := downloadAsset(owner, repo, a)
 	if err != nil {
 		return nil, err
 	}
@@ -209,6 +216,29 @@ func makeFS(owner, repo string, a *github.ReleaseAsset) (fs.FS, error) {
 	}
 }
 
+func downloadAsset(owner, repo string, a *github.ReleaseAsset) ([]byte, error) {
+	client, err := gh.HTTPClient(&api.ClientOptions{
+		Headers: map[string]string{
+			"Accept": "application/octet-stream",
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	_, v3ep, _, _ := factory.GetTokenAndEndpoints()
+	u := fmt.Sprintf("%s/repos/%s/%s/releases/assets/%d", v3ep, owner, repo, a.GetID())
+	resp, err := client.Get(u)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return b, nil
+}
+
 func contains(s []string, e string) bool {
 	for _, v := range s {
 		if e == v {
@@ -216,26 +246,4 @@ func contains(s []string, e string) bool {
 		}
 	}
 	return false
-}
-
-func DetectHostOwnerRepo(ownerrepo string) (string, string, string, error) {
-	var host, owner, repo string
-	r, err := gh.CurrentRepository()
-	if err != nil {
-		return "", "", "", err
-	}
-	if ownerrepo == "" {
-		host = r.Host()
-		owner = r.Owner()
-		repo = r.Name()
-	} else {
-		r, err := repository.Parse(ownerrepo)
-		if err != nil {
-			return "", "", "", err
-		}
-		host = r.Host()
-		owner = r.Owner()
-		repo = r.Name()
-	}
-	return host, owner, repo, nil
 }
