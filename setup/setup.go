@@ -30,6 +30,12 @@ func Bin(fsys fs.FS, bd string, force bool) (map[string]string, error) {
 		if d.IsDir() {
 			return nil
 		}
+		for _, i := range ignoreBinnameKeywords {
+			if strings.Contains(filepath.ToSlash(strings.ToLower(path)), filepath.ToSlash(strings.ToLower(i))) {
+				return nil
+			}
+		}
+
 		b, err := fs.ReadFile(fsys, path)
 		if err != nil {
 			return err
@@ -58,7 +64,7 @@ func Bin(fsys fs.FS, bd string, force bool) (map[string]string, error) {
 }
 
 var priorityPaths = []string{"/usr/local/bin", "/usr/bin"}
-var ignoreKeywords = []string{
+var ignorePathKeywords = []string{
 	"homebrew",
 	"X11",
 	"/usr/local/opt",
@@ -73,6 +79,12 @@ var ignoreKeywords = []string{
 	".yarn",
 	"/Library/",
 	"hostedtoolcache",
+}
+var ignoreBinnameKeywords = []string{
+	"CHANGELOG",
+	"README",
+	"CREDIT",
+	"LICENSE",
 }
 
 func binDir() (string, error) {
@@ -103,7 +115,7 @@ func sortPaths(paths []string) ([]string, error) {
 	filtered := []string{}
 L:
 	for _, p := range paths {
-		for _, i := range ignoreKeywords {
+		for _, i := range ignorePathKeywords {
 			if strings.Contains(filepath.ToSlash(strings.ToLower(p)), filepath.ToSlash(strings.ToLower(i))) {
 				continue L
 			}
