@@ -4,4 +4,4 @@ package version
 const Name string = "gh-setup"
 
 // Version for this.
-var Version = "0.6.0"
+var Version = "0.7.0"
