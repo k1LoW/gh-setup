@@ -82,11 +82,11 @@ func GetReleaseAsset(ctx context.Context, owner, repo string, opt *AssetOption) 
 
 func DetectHostOwnerRepo(ownerrepo string) (string, string, string, error) {
 	var host, owner, repo string
-	r, err := gh.CurrentRepository()
-	if err != nil {
-		return "", "", "", err
-	}
 	if ownerrepo == "" {
+		r, err := gh.CurrentRepository()
+		if err != nil {
+			return "", "", "", err
+		}
 		host = r.Host()
 		owner = r.Owner()
 		repo = r.Name()
