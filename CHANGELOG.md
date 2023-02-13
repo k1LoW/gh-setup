@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.7.1](https://github.com/k1LoW/gh-setup/compare/v0.7.0...v0.7.1) - 2023-02-13
+- Fix detecting content-type of asset by @k1LoW in https://github.com/k1LoW/gh-setup/pull/35
+- Set log by @k1LoW in https://github.com/k1LoW/gh-setup/pull/34
+
 ## [v0.7.0](https://github.com/k1LoW/gh-setup/compare/v0.6.0...v0.7.0) - 2023-02-13
 - Support setup without credentials by @k1LoW in https://github.com/k1LoW/gh-setup/pull/31
 - Fix #31 by @k1LoW in https://github.com/k1LoW/gh-setup/pull/32
