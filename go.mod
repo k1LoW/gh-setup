@@ -7,7 +7,7 @@ require (
 	github.com/google/go-cmp v0.5.9
 	github.com/google/go-github/v50 v50.0.0
 	github.com/h2non/filetype v1.1.3
-	github.com/k1LoW/go-github-client/v50 v50.0.5
+	github.com/k1LoW/go-github-client/v50 v50.0.6
 	github.com/nlepage/go-tarfs v1.1.0
 	github.com/spf13/cobra v1.6.1
 )

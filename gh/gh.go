@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"os"
 	"regexp"
 	"runtime"
 	"sort"
@@ -53,7 +54,7 @@ type AssetOption struct {
 }
 
 func GetReleaseAsset(ctx context.Context, owner, repo string, opt *AssetOption) (*github.ReleaseAsset, fs.FS, error) {
-	c, err := factory.NewGithubClient()
+	c, err := client(ctx)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -246,4 +247,20 @@ func contains(s []string, e string) bool {
 		}
 	}
 	return false
+}
+
+func client(ctx context.Context) (*github.Client, error) {
+	token, _, _, _ := factory.GetTokenAndEndpoints()
+	if token == "" {
+		// Successful unauthenticated API call with one failed authentication instead of skipping authentication immediately.
+		os.Setenv("GITHUB_TOKEN", "gh-setup-fake-token")
+	}
+	c, err := factory.NewGithubClient()
+	if err != nil {
+		return nil, err
+	}
+	if _, _, err := c.Users.Get(ctx, ""); err != nil {
+		return factory.NewGithubClient(factory.SkipAuth(true))
+	}
+	return c, nil
 }

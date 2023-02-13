@@ -37,8 +37,6 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Check out source code
         uses: actions/checkout@v3
@@ -51,16 +49,27 @@ jobs:
 
       - name: Run setup test
         run: |
-          go run cmd/gh-setup/main.go --repo k1LoW/gh-setup --version v0.5.1 --force
+          go run cmd/gh-setup/main.go --repo k1LoW/gh-setup --version v0.6.0 --force
+          gh-setup version
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run setup test (no credentials)
+        run: |
+          env | grep GH_
+          env | grep GITHUB_
+          go run cmd/gh-setup/main.go --repo k1LoW/gh-setup --version v0.6.0 --force
           gh-setup version
         shell: bash
 
       - name: Run setup as a action (1/2)
         uses: ./
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           repo: k1LoW/tbls
           force: true
-          gh-setup-version: v0.5.1
+          gh-setup-version: v0.6.0
 
       - name: Run setup as a action (2/2)
         run: tbls version
