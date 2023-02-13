@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.6.0](https://github.com/k1LoW/gh-setup/compare/v0.5.1...v0.6.0) - 2023-02-13
+- Fix CI by @k1LoW in https://github.com/k1LoW/gh-setup/pull/28
+
 ## [v0.5.1](https://github.com/k1LoW/gh-setup/compare/v0.5.0...v0.5.1) - 2023-02-13
 - [BREAKING] Change API of version by @k1LoW in https://github.com/k1LoW/gh-setup/pull/26
 
