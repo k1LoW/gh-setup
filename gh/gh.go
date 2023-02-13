@@ -18,6 +18,7 @@ import (
 
 	"github.com/cli/go-gh"
 	"github.com/cli/go-gh/pkg/api"
+	"github.com/cli/go-gh/pkg/repository"
 	"github.com/google/go-github/v50/github"
 	"github.com/k1LoW/go-github-client/v50/factory"
 	"github.com/nlepage/go-tarfs"
@@ -228,19 +229,13 @@ func DetectHostOwnerRepo(ownerrepo string) (string, string, string, error) {
 		owner = r.Owner()
 		repo = r.Name()
 	} else {
-		splitted := strings.Split(ownerrepo, "/")
-		switch len(splitted) {
-		case 2:
-			host = r.Host()
-			owner = splitted[0]
-			repo = splitted[1]
-		case 3:
-			host = splitted[0]
-			owner = splitted[1]
-			repo = splitted[2]
-		default:
-			return "", "", "", fmt.Errorf("invalid repo: %s", ownerrepo)
+		r, err := repository.Parse(ownerrepo)
+		if err != nil {
+			return "", "", "", err
 		}
+		host = r.Host()
+		owner = r.Owner()
+		repo = r.Name()
 	}
 	return host, owner, repo, nil
 }
