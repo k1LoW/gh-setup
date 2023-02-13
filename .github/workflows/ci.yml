@@ -37,6 +37,8 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
+    env:
+      DEBUG: true
     steps:
       - name: Check out source code
         uses: actions/checkout@v3

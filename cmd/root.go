@@ -25,6 +25,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
+	"log"
 	"os"
 
 	"github.com/k1LoW/gh-setup/gh"
@@ -88,8 +90,15 @@ var rootCmd = &cobra.Command{
 }
 
 func Execute() {
-	err := rootCmd.Execute()
-	if err != nil {
+	rootCmd.SetOut(os.Stdout)
+	rootCmd.SetErr(os.Stderr)
+
+	log.SetOutput(io.Discard)
+	if env := os.Getenv("DEBUG"); env != "" {
+		log.SetOutput(os.Stderr)
+	}
+
+	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
 }
