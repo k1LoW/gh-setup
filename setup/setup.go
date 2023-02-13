@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -24,6 +25,7 @@ func Bin(fsys fs.FS, bd string, force bool) (map[string]string, error) {
 		}
 	}
 	if err := fs.WalkDir(fsys, ".", func(path string, d fs.DirEntry, err error) error {
+		log.Println("extract file:", path)
 		if err != nil {
 			return err
 		}
@@ -158,6 +160,7 @@ func isBinary(b []byte) bool {
 	// FIXME: On Windows, it can't be detected at all.
 	const binaryContentType = "application/octet-stream"
 	contentType := http.DetectContentType(b)
+	log.Println("content type:", contentType)
 	if contentType == binaryContentType {
 		return true
 	}
@@ -165,6 +168,7 @@ func isBinary(b []byte) bool {
 	if err != nil {
 		return false
 	}
+	log.Printf("file type: %v\n", typ)
 	if typ == filetype.Unknown {
 		return true
 	}

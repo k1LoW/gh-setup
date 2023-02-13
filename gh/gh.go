@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"log"
 	"net/http"
 	"regexp"
 	"runtime"
@@ -176,10 +177,12 @@ func makeFS(owner, repo string, a *github.ReleaseAsset) (fs.FS, error) {
 	if err != nil {
 		return nil, err
 	}
-	switch a.GetContentType() {
-	case "application/zip", "application/x-zip-compressed":
+	cts := []string{a.GetContentType(), http.DetectContentType(b)}
+	log.Println("asset content type:", cts)
+	switch {
+	case matchContentTypes([]string{"application/zip", "application/x-zip-compressed"}, cts):
 		return zip.NewReader(bytes.NewReader(b), int64(len(b)))
-	case "application/gzip":
+	case matchContentTypes([]string{"application/gzip", "application/x-gzip"}, cts):
 		gr, err := gzip.NewReader(bytes.NewReader(b))
 		if err != nil {
 			return nil, err
@@ -204,7 +207,7 @@ func makeFS(owner, repo string, a *github.ReleaseAsset) (fs.FS, error) {
 			}
 			return fsys, nil
 		}
-	case "application/octet-stream":
+	case matchContentTypes([]string{"application/octet-stream"}, cts):
 		fsys := fstest.MapFS{}
 		fsys[repo] = &fstest.MapFile{
 			Data:    b,
@@ -294,4 +297,15 @@ func httpClient() (*http.Client, error) {
 		}
 	}
 	return client, nil
+}
+
+func matchContentTypes(m, ct []string) bool {
+	for _, v := range m {
+		for _, vv := range ct {
+			if v == vv {
+				return true
+			}
+		}
+	}
+	return false
 }
