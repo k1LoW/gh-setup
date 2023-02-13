@@ -37,5 +37,5 @@ fi
 # download
 curl -sL -o ${bin} https://github.com/k1LoW/gh-setup/releases/download/${tag}/${exe}
 chmod +x ${bin}
-${bin} -v
+${bin} version
 echo "bin=${bin}" >> ${GITHUB_OUTPUT}

@@ -51,8 +51,8 @@ jobs:
 
       - name: Run setup test
         run: |
-          go run cmd/gh-setup/main.go --repo k1LoW/gh-setup --version v0.4.0 --force
-          gh-setup -v
+          go run cmd/gh-setup/main.go --repo k1LoW/gh-setup --version v0.5.1 --force
+          gh-setup version
         shell: bash
 
       - name: Run setup as a action (1/2)
@@ -60,7 +60,7 @@ jobs:
         with:
           repo: k1LoW/tbls
           force: true
-          gh-setup-version: v0.4.0
+          gh-setup-version: v0.5.1
 
       - name: Run setup as a action (2/2)
         run: tbls version
