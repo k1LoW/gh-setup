@@ -14,7 +14,7 @@ arch=${GH_SETUP_ARCH}
 force=${GH_SETUP_FORCE}
 
 if [ -z "${force}" ]; then
-  ${bin} --repo ${repo} --bin-dir=${bindir} --release-version=${version} --os=${os} --arch=${arch}
+  ${bin} --repo ${repo} --bin-dir=${bindir} --version=${version} --os=${os} --arch=${arch}
 else
-  ${bin} --repo ${repo} --bin-dir=${bindir} --release-version=${version} --os=${os} --arch=${arch} --force
+  ${bin} --repo ${repo} --bin-dir=${bindir} --version=${version} --os=${os} --arch=${arch} --force
 fi
