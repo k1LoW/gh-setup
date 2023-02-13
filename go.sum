@@ -28,8 +28,8 @@ github.com/henvic/httpretty v0.0.6 h1:JdzGzKZBajBfnvlMALXXMVQWxWMF/ofTy8C3/OSUTx
 github.com/henvic/httpretty v0.0.6/go.mod h1:X38wLjWXHkXT7r2+uK8LjCMne9rsuNaBLJ+5cU2/Pmo=
 github.com/inconshreveable/mousetrap v1.0.1 h1:U3uMjPSQEBMNp1lFxmllqCPM6P5u/Xq7Pgzkat/bFNc=
 github.com/inconshreveable/mousetrap v1.0.1/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
-github.com/k1LoW/go-github-client/v50 v50.0.5 h1:0aO3tTAniZiD3YJE0JGCyhwfIwm691mDi1or/TH5Qys=
-github.com/k1LoW/go-github-client/v50 v50.0.5/go.mod h1:+uzhSKvcvqrNwV6nb9MDaTdvVbwKXCyGFqzYSPHOpcE=
+github.com/k1LoW/go-github-client/v50 v50.0.6 h1:QmDkUBNywMDBY34T8l2la+WNYcZ5qLF2vA7MQA9BPko=
+github.com/k1LoW/go-github-client/v50 v50.0.6/go.mod h1:+uzhSKvcvqrNwV6nb9MDaTdvVbwKXCyGFqzYSPHOpcE=
 github.com/kr/pretty v0.1.0 h1:L/CwN0zerZDmRFUapSPitk6f+Q3+0za1rQkzVuMiMFI=
 github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=
 github.com/lucasb-eyer/go-colorful v1.2.0 h1:1nnpGOrhyZZuNyfu1QjKiUICQ74+3FNCN69Aj6K7nkY=
