@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.5.0](https://github.com/k1LoW/gh-setup/compare/v0.4.0...v0.5.0) - 2023-02-13
+- Fix README/CI by @k1LoW in https://github.com/k1LoW/gh-setup/pull/21
+- Support custom API host by @k1LoW in https://github.com/k1LoW/gh-setup/pull/23
+- Add ignoreBinnameKeywords by @k1LoW in https://github.com/k1LoW/gh-setup/pull/24
+- Fix detecting API endpoint by @k1LoW in https://github.com/k1LoW/gh-setup/pull/25
+
 ## [v0.4.0](https://github.com/k1LoW/gh-setup/compare/v0.3.0...v0.4.0) - 2023-02-12
 - Add `gh-setup-version:` by @k1LoW in https://github.com/k1LoW/gh-setup/pull/19
 
