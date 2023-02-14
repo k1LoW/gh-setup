@@ -257,13 +257,16 @@ func contains(s []string, e string) bool {
 func client(ctx context.Context) (*github.Client, error) {
 	token, _, _, _ := factory.GetTokenAndEndpoints()
 	if token == "" {
+		log.Println("No credentials found, access without credentials")
 		return factory.NewGithubClient(factory.SkipAuth(true))
 	}
+	log.Println("Access with credentials")
 	c, err := factory.NewGithubClient()
 	if err != nil {
 		return nil, err
 	}
 	if _, _, err := c.Users.Get(ctx, ""); err != nil {
+		log.Println("Authentication failed, access without credentials")
 		return factory.NewGithubClient(factory.SkipAuth(true))
 	}
 	return c, nil
@@ -272,11 +275,13 @@ func client(ctx context.Context) (*github.Client, error) {
 func httpClient() (*http.Client, error) {
 	token, v3ep, _, _ := factory.GetTokenAndEndpoints()
 	if token == "" {
+		log.Println("No credentials found, access without credentials")
 		return &http.Client{
 			Timeout:   30 * time.Second,
 			Transport: http.DefaultTransport.(*http.Transport).Clone(),
 		}, nil
 	}
+	log.Println("Access with credentials")
 	client, err := gh.HTTPClient(&api.ClientOptions{})
 	if err != nil {
 		return nil, err
@@ -292,6 +297,7 @@ func httpClient() (*http.Client, error) {
 	}
 	resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
+		log.Println("Authentication failed, access without credentials")
 		client = &http.Client{
 			Timeout:   30 * time.Second,
 			Transport: http.DefaultTransport.(*http.Transport).Clone(),
