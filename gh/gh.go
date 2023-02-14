@@ -55,12 +55,13 @@ type AssetOption struct {
 }
 
 func GetReleaseAsset(ctx context.Context, owner, repo string, opt *AssetOption) (*github.ReleaseAsset, fs.FS, error) {
+	const versionLatest = "latest"
 	c, err := client(ctx)
 	if err != nil {
 		return nil, nil, err
 	}
 	var r *github.RepositoryRelease
-	if opt != nil && opt.Version == "" {
+	if opt != nil && (opt.Version == "" || opt.Version == versionLatest) {
 		r, _, err = c.Repositories.GetLatestRelease(ctx, owner, repo)
 		if err != nil {
 			return nil, nil, err
