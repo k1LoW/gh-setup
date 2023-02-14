@@ -16,13 +16,13 @@ import (
 	"github.com/h2non/filetype"
 )
 
-type SetupOption struct {
+type Option struct {
 	BinDir   string
 	BinMatch string
 	Force    bool
 }
 
-func Bin(fsys fs.FS, opt *SetupOption) (map[string]string, error) {
+func Bin(fsys fs.FS, opt *Option) (map[string]string, error) {
 	var (
 		bd    string
 		bm    *regexp.Regexp
@@ -197,8 +197,5 @@ func isBinary(b []byte) bool {
 		return false
 	}
 	log.Printf("file type: %v\n", typ)
-	if typ == filetype.Unknown {
-		return true
-	}
-	return false
+	return typ == filetype.Unknown
 }

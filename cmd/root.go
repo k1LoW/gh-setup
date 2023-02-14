@@ -39,7 +39,7 @@ var ownerrepo string
 
 var (
 	opt  = &gh.AssetOption{}
-	sOpt = &setup.SetupOption{}
+	sOpt = &setup.Option{}
 )
 
 var rootCmd = &cobra.Command{
