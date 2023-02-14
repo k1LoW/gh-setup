@@ -9,14 +9,18 @@ fi
 export GITHUB_TOKEN=${token}
 
 repo=${GH_SETUP_REPO}
-bindir=${GH_SETUP_BIN_DIR}
 version=${GH_SETUP_VERSION}
 os=${GH_SETUP_OS}
 arch=${GH_SETUP_ARCH}
+match=${GH_SETUP_MATCH}
+bin_dir=${GH_SETUP_BIN_DIR}
+bin_match=${GH_SETUP_BIN_MATCH}
 force=${GH_SETUP_FORCE}
 
 if [ -z "${force}" ]; then
-  ${bin} --repo ${repo} --bin-dir=${bindir} --version=${version} --os=${os} --arch=${arch}
+  # ${bin} --repo ${repo} --version=${version} --os=${os} --arch=${arch} --bin-dir=${bin_dir} --bin-match=${bin_match}
+  ${bin} --repo ${repo} --version=${version} --os=${os} --arch=${arch} --bin-dir=${bin_dir}
 else
-  ${bin} --repo ${repo} --bin-dir=${bindir} --version=${version} --os=${os} --arch=${arch} --force
+  # ${bin} --repo ${repo} --version=${version} --os=${os} --arch=${arch} --bin-dir=${bin_dir} --bin-match=${bin_match} --force
+  ${bin} --repo ${repo} --version=${version} --os=${os} --arch=${arch} --bin-dir=${bin_dir} --force
 fi

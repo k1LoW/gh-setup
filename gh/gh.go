@@ -108,9 +108,13 @@ func DetectHostOwnerRepo(ownerrepo string) (string, string, string, error) {
 func detectAsset(assets []*github.ReleaseAsset, opt *AssetOption) (*github.ReleaseAsset, error) {
 	var (
 		od, ad, om *regexp.Regexp
+		err        error
 	)
 	if opt != nil && opt.Match != "" {
-		om = regexp.MustCompile(opt.Match)
+		om, err = regexp.Compile(opt.Match)
+		if err != nil {
+			return nil, err
+		}
 	}
 	if opt != nil && opt.OS != "" {
 		od = getDictRegexp(opt.OS, osDict)
