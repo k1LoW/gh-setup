@@ -1,5 +1,8 @@
 name: 'Setup asset of Github Releases'
 description: 'GitHub Action for gh-setup'
+branding:
+  icon: 'zap'
+  color: 'gray-dark'
 inputs:
   github-token:
     description: The GitHub token
