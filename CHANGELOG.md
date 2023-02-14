@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.7.2](https://github.com/k1LoW/gh-setup/compare/v0.7.1...v0.7.2) - 2023-02-14
+- Set `${{ github.action_path }}` by @k1LoW in https://github.com/k1LoW/gh-setup/pull/36
+
 ## [v0.7.1](https://github.com/k1LoW/gh-setup/compare/v0.7.0...v0.7.1) - 2023-02-13
 - Fix detecting content-type of asset by @k1LoW in https://github.com/k1LoW/gh-setup/pull/35
 - Set log by @k1LoW in https://github.com/k1LoW/gh-setup/pull/34
