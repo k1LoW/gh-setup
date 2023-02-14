@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.8.1](https://github.com/k1LoW/gh-setup/compare/v0.8.0...v0.8.1) - 2023-02-14
+- Suppor `bin-match` for action.yml by @k1LoW in https://github.com/k1LoW/gh-setup/pull/43
+
 ## [v0.8.0](https://github.com/k1LoW/gh-setup/compare/v0.7.4...v0.8.0) - 2023-02-14
 - Fix match logic by @k1LoW in https://github.com/k1LoW/gh-setup/pull/41
 
