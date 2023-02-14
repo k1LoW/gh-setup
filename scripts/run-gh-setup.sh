@@ -18,9 +18,7 @@ bin_match=${GH_SETUP_BIN_MATCH}
 force=${GH_SETUP_FORCE}
 
 if [ -z "${force}" ]; then
-  # ${bin} --repo ${repo} --version=${version} --os=${os} --arch=${arch} --bin-dir=${bin_dir} --bin-match=${bin_match}
-  ${bin} --repo ${repo} --version=${version} --os=${os} --arch=${arch} --bin-dir=${bin_dir}
+  ${bin} --repo ${repo} --version=${version} --os=${os} --arch=${arch} --bin-dir=${bin_dir} --bin-match=${bin_match}
 else
-  # ${bin} --repo ${repo} --version=${version} --os=${os} --arch=${arch} --bin-dir=${bin_dir} --bin-match=${bin_match} --force
-  ${bin} --repo ${repo} --version=${version} --os=${os} --arch=${arch} --bin-dir=${bin_dir} --force
+  ${bin} --repo ${repo} --version=${version} --os=${os} --arch=${arch} --bin-dir=${bin_dir} --bin-match=${bin_match} --force
 fi
