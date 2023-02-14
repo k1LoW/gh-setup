@@ -4,6 +4,11 @@
 
 [![build](https://github.com/k1LoW/gh-setup/actions/workflows/ci.yml/badge.svg)](https://github.com/k1LoW/gh-setup/actions/workflows/ci.yml) ![Coverage](https://raw.githubusercontent.com/k1LoW/octocovs/main/badges/k1LoW/gh-setup/coverage.svg) ![Code to Test Ratio](https://raw.githubusercontent.com/k1LoW/octocovs/main/badges/k1LoW/gh-setup/ratio.svg)
 
+Key features of `gh-setup` are:
+
+- **For setup, detect the version, the appropriate GitHub Releases asset, the asset's compressed format, and the executable path where the binary will be installed.**
+- **Works as a GitHub CLI extension (or a standalone CLI) as well as a GitHub Action.**
+
 ## As a GitHub CLI extension
 
 ### Usage
@@ -40,6 +45,7 @@ $ gh extension install k1LoW/gh-grep
         # version: v1.60.0
         # os: linux
         # arch: amd64
+        # bin-match: tbls
         # force: true
         # gh-setup-version: latest
       -
