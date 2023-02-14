@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -15,9 +16,30 @@ import (
 	"github.com/h2non/filetype"
 )
 
-func Bin(fsys fs.FS, bd string, force bool) (map[string]string, error) {
-	var err error
+type SetupOption struct {
+	BinDir   string
+	BinMatch string
+	Force    bool
+}
+
+func Bin(fsys fs.FS, opt *SetupOption) (map[string]string, error) {
+	var (
+		bd    string
+		bm    *regexp.Regexp
+		force bool
+		err   error
+	)
 	m := map[string]string{}
+	if opt != nil {
+		force = opt.Force
+		bd = opt.BinDir
+		if opt.BinMatch != "" {
+			bm, err = regexp.Compile(opt.BinMatch)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
 	if bd == "" {
 		bd, err = binDir()
 		if err != nil {
@@ -32,9 +54,15 @@ func Bin(fsys fs.FS, bd string, force bool) (map[string]string, error) {
 		if d.IsDir() {
 			return nil
 		}
-		for _, i := range ignoreBinnameKeywords {
-			if strings.Contains(filepath.ToSlash(strings.ToLower(path)), filepath.ToSlash(strings.ToLower(i))) {
+		if bm != nil {
+			if !bm.MatchString(path) {
 				return nil
+			}
+		} else {
+			for _, i := range ignoreBinnameKeywords {
+				if strings.Contains(filepath.ToSlash(strings.ToLower(path)), filepath.ToSlash(strings.ToLower(i))) {
+					return nil
+				}
 			}
 		}
 

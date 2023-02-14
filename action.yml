@@ -11,10 +11,6 @@ inputs:
   repo:
     description: "Target repository [OWNER/REPO]"
     required: true
-  bin-dir:
-    description: "Executable path"
-    default: ""
-    required: false
   version:
     description: "Release version"
     default: ""
@@ -28,7 +24,15 @@ inputs:
     default: ""
     required: false
   match:
-    description: "Match string for asset"
+    description: "Regexp to match asset name"
+    default: ""
+    required: false
+  bin-dir:
+    description: "Executable path"
+    default: ""
+    required: false
+  bin-match:
+    description: "Regexp to match bin path in asset"
     default: ""
     required: false
   force:
@@ -55,9 +59,11 @@ runs:
       env:
         GH_SETUP_GITHUB_TOKEN: ${{ inputs.github-token }}
         GH_SETUP_REPO: ${{ inputs.repo }}
-        GH_SETUP_BIN_DIR: ${{ inputs.bin-dir }}
         GH_SETUP_VERSION: ${{ inputs.version }}
         GH_SETUP_OS: ${{ inputs.os }}
         GH_SETUP_ARCH: ${{ inputs.arch }}
+        GH_SETUP_MATCH: ${{ inputs.match }}
+        GH_SETUP_BIN_DIR: ${{ inputs.bin-dir }}
+        GH_SETUP_BIN_MATCH: ${{ inputs.bin-match }}
         GH_SETUP_FORCE: ${{ inputs.force }}
         GH_SETUP_BIN: ${{ steps.install-gh-setup.outputs.bin }}

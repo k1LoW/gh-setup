@@ -35,13 +35,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	ownerrepo string
-	binDir    string
-	force     bool
-)
+var ownerrepo string
 
-var opt = &gh.AssetOption{}
+var (
+	opt  = &gh.AssetOption{}
+	sOpt = &setup.SetupOption{}
+)
 
 var rootCmd = &cobra.Command{
 	Use:       "gh-setup",
@@ -74,7 +73,7 @@ var rootCmd = &cobra.Command{
 			return err
 		}
 		cmd.Printf("Use %s\n", a.GetName())
-		m, err := setup.Bin(fsys, binDir, force)
+		m, err := setup.Bin(fsys, sOpt)
 		if err != nil {
 			return err
 		}
@@ -105,10 +104,11 @@ func Execute() {
 
 func init() {
 	rootCmd.Flags().StringVarP(&ownerrepo, "repo", "R", "", "repository using the [HOST/]OWNER/REPO format")
-	rootCmd.Flags().StringVarP(&binDir, "bin-dir", "", "", "bin directory for setup")
-	rootCmd.Flags().BoolVarP(&force, "force", "f", false, "enable force setup")
 	rootCmd.Flags().StringVarP(&opt.Version, "version", "v", "", "release version")
 	rootCmd.Flags().StringVarP(&opt.OS, "os", "O", "", "specify OS of asset")
 	rootCmd.Flags().StringVarP(&opt.Arch, "arch", "A", "", "specify arch of asset")
-	rootCmd.Flags().StringVarP(&opt.Match, "match", "", "", "match string for asset")
+	rootCmd.Flags().StringVarP(&opt.Match, "match", "", "", "regexp to match asset name")
+	rootCmd.Flags().StringVarP(&sOpt.BinDir, "bin-dir", "", "", "bin directory for setup")
+	rootCmd.Flags().StringVarP(&sOpt.BinMatch, "bin-match", "", "", "regexp to match bin path in asset")
+	rootCmd.Flags().BoolVarP(&sOpt.Force, "force", "f", false, "enable force setup")
 }
