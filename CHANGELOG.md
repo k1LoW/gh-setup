@@ -1,5 +1,7 @@
 # Changelog
 
+## [v0.7.4](https://github.com/k1LoW/gh-setup/compare/v0.7.3...v0.7.4) - 2023-02-14
+
 ## [v0.7.3](https://github.com/k1LoW/gh-setup/compare/v0.7.2...v0.7.3) - 2023-02-14
 - Fix handling for `--version=latest` by @k1LoW in https://github.com/k1LoW/gh-setup/pull/38
 
