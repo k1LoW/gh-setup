@@ -39,7 +39,7 @@ $ gh extension install k1LoW/gh-grep
     steps:
       -
         name: Setup k1LoW/tbls
-        run: k1LoW/gh-setup@v0
+        run: k1LoW/gh-setup@v1
         with:
           github-token: ${secrets.GITHUB_TOKEN}
           repo: k1LoW/tbls
@@ -83,7 +83,7 @@ runs:
   using: 'composite'
   steps:
     -
-      uses: k1LoW/gh-setup@v0
+      uses: k1LoW/gh-setup@v1
       with:
         repo: github.com/k1LoW/tbls
         github-token: ${{ inputs.github-token }}
