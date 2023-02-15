@@ -111,4 +111,5 @@ func init() {
 	rootCmd.Flags().StringVarP(&sOpt.BinDir, "bin-dir", "", "", "bin directory for setup")
 	rootCmd.Flags().StringVarP(&sOpt.BinMatch, "bin-match", "", "", "regexp to match bin path in asset")
 	rootCmd.Flags().BoolVarP(&sOpt.Force, "force", "f", false, "enable force setup")
+	rootCmd.Flags().BoolVarP(&opt.Strict, "strict", "", false, "require strict match")
 }
