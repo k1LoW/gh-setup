@@ -70,7 +70,8 @@ jobs:
         with:
           repo: k1LoW/tbls
           force: true
-          gh-setup-version: v0.8.0
+          strict: true
+          gh-setup-version: v0.8.2
 
       - name: Run setup as a action (2/2)
         run: tbls version
@@ -82,7 +83,8 @@ jobs:
           github-token: ''
           repo: k1LoW/colr
           force: true
-          gh-setup-version: v0.8.0
+          strict: true
+          gh-setup-version: v0.8.2
 
       - name: Run setup as a action (no credentials) (2/2)
         run: colr -v
