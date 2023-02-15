@@ -49,23 +49,22 @@ jobs:
           go-version-file: go.mod
           cache: true
 
-      - name: Run setup test (no credentials)
+      - name: Run setup test
         run: |
-          env | grep GH_ || true
-          env | grep GITHUB_ || true
           go run cmd/gh-setup/main.go --repo k1LoW/gh-setup --version v0.6.0 --force
           gh-setup version
         shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run setup as a action (no credentials) (1/2)
+      - name: Run setup as a action (1/2)
         uses: ./
         with:
-          github-token: ''
-          repo: k1LoW/colr
+          repo: k1LoW/tbls
           force: true
           strict: true
           gh-setup-version: v0.8.2
 
-      - name: Run setup as a action (no credentials) (2/2)
-        run: colr -v
+      - name: Run setup as a action (2/2)
+        run: tbls version
         shell: bash
