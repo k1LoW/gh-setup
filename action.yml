@@ -39,6 +39,10 @@ inputs:
     description: "Enable force setup"
     default: ""
     required: false
+  strict:
+    description: "Require strict match"
+    default: ""
+    required: false
   gh-setup-version:
     description: "Version of gh-setup"
     default: "v0.8.1"
@@ -66,4 +70,5 @@ runs:
         GH_SETUP_BIN_DIR: ${{ inputs.bin-dir }}
         GH_SETUP_BIN_MATCH: ${{ inputs.bin-match }}
         GH_SETUP_FORCE: ${{ inputs.force }}
+        GH_SETUP_STRICT: ${{ inputs.strict }}
         GH_SETUP_BIN: ${{ steps.install-gh-setup.outputs.bin }}

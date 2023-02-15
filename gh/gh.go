@@ -52,6 +52,7 @@ type AssetOption struct {
 	Version string
 	OS      string
 	Arch    string
+	Strict  bool
 }
 
 func GetReleaseAsset(ctx context.Context, owner, repo string, opt *AssetOption) (*github.ReleaseAsset, fs.FS, error) {
@@ -157,13 +158,20 @@ func detectAsset(assets []*github.ReleaseAsset, opt *AssetOption) (*github.Relea
 			as.score += 1
 		}
 	}
+	if opt.Strict && om != nil {
+		return nil, fmt.Errorf("no matching assets found: %s", opt.Match)
+	}
 	if len(assetScores) == 0 {
-		return nil, errors.New("assets not found")
+		return nil, errors.New("no matching assets found")
 	}
 
 	sort.Slice(assetScores, func(i, j int) bool {
 		return assetScores[i].score > assetScores[j].score
 	})
+
+	if opt.Strict && assetScores[0].score < 10 {
+		return nil, fmt.Errorf("no matching assets found for OS/Arch: %s/%s", opt.OS, opt.Arch)
+	}
 
 	return assetScores[0].asset, nil
 }
