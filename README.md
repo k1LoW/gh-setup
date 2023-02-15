@@ -48,6 +48,7 @@ $ gh extension install k1LoW/gh-grep
         # arch: amd64
         # bin-match: tbls
         # force: true
+        # strict: true
         # gh-setup-version: latest
       -
         name: Run tbls
