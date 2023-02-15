@@ -8,6 +8,7 @@ Key features of `gh-setup` are:
 
 - **For setup, detect the version, the appropriate GitHub Releases asset, the asset's compressed format, and the executable path where the binary will be installed.**
 - **Works as a GitHub CLI extension (or a standalone CLI) as well as a GitHub Action.**
+- **Could be used as a part to create a GitHub Action like `setup-*`.**
 
 ## As a GitHub CLI extension
 
@@ -51,6 +52,43 @@ $ gh extension install k1LoW/gh-grep
       -
         name: Run tbls
         run: tbls doc
+```
+
+## As a part to create a GitHub Action like `setup-*`
+
+See https://github.com/k1LoW/setup-tbls
+
+``` yaml
+# action.yml
+name: 'Setup tbls'
+description: 'GitHub Action for tbls, a CI-Friendly tool for document a database, written in Go.'
+branding:
+  icon: 'box'
+  color: 'blue'
+inputs:
+  github-token:
+    description: The GitHub token
+    default: ${{ github.token }}
+    required: false
+  version:
+    description: Version of tbls
+    default: latest
+    required: false
+  force:
+    description: Enable force setup
+    default: ''
+    required: false
+runs:
+  using: 'composite'
+  steps:
+    -
+      uses: k1LoW/gh-setup@v0
+      with:
+        repo: github.com/k1LoW/tbls
+        github-token: ${{ inputs.github-token }}
+        version: ${{ inputs.version }}
+        bin-match: tbls
+        force: ${{ inputs.force }}
 ```
 
 ## As a Standalone CLI
