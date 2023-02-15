@@ -1,5 +1,8 @@
 # Changelog
 
+## [v1.0.0](https://github.com/k1LoW/gh-setup/compare/v0.8.3...v1.0.0) - 2023-02-15
+- Bump up version number by @k1LoW in https://github.com/k1LoW/gh-setup/pull/49
+
 ## [v0.8.3](https://github.com/k1LoW/gh-setup/compare/v0.8.2...v0.8.3) - 2023-02-15
 - Support `--strict` in Action by @k1LoW in https://github.com/k1LoW/gh-setup/pull/47
 
