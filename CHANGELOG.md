@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.8.3](https://github.com/k1LoW/gh-setup/compare/v0.8.2...v0.8.3) - 2023-02-15
+- Support `--strict` in Action by @k1LoW in https://github.com/k1LoW/gh-setup/pull/47
+
 ## [v0.8.2](https://github.com/k1LoW/gh-setup/compare/v0.8.1...v0.8.2) - 2023-02-15
 - Add `--strict` for require strict match. by @k1LoW in https://github.com/k1LoW/gh-setup/pull/46
 
