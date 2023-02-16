@@ -57,7 +57,7 @@ type AssetOption struct {
 
 func GetReleaseAsset(ctx context.Context, owner, repo string, opt *AssetOption) (*github.ReleaseAsset, fs.FS, error) {
 	const versionLatest = "latest"
-	c, err := client(ctx)
+	c, err := client(ctx, owner, repo)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -234,7 +234,7 @@ func makeFS(owner, repo string, a *github.ReleaseAsset) (fs.FS, error) {
 }
 
 func downloadAsset(owner, repo string, a *github.ReleaseAsset) ([]byte, error) {
-	client, err := httpClient()
+	client, err := httpClient(owner, repo)
 	if err != nil {
 		return nil, err
 	}
@@ -266,7 +266,7 @@ func contains(s []string, e string) bool {
 	return false
 }
 
-func client(ctx context.Context) (*github.Client, error) {
+func client(ctx context.Context, owner, repo string) (*github.Client, error) {
 	token, _, _, _ := factory.GetTokenAndEndpoints()
 	if token == "" {
 		log.Println("No credentials found, access without credentials")
@@ -277,14 +277,14 @@ func client(ctx context.Context) (*github.Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	if _, _, err := c.Users.Get(ctx, ""); err != nil {
+	if _, _, err := c.Repositories.Get(ctx, owner, repo); err != nil {
 		log.Println("Authentication failed, access without credentials")
 		return factory.NewGithubClient(factory.SkipAuth(true))
 	}
 	return c, nil
 }
 
-func httpClient() (*http.Client, error) {
+func httpClient(owner, repo string) (*http.Client, error) {
 	token, v3ep, _, _ := factory.GetTokenAndEndpoints()
 	if token == "" {
 		log.Println("No credentials found, access without credentials")
@@ -298,7 +298,7 @@ func httpClient() (*http.Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	u := fmt.Sprintf("%s/user", v3ep)
+	u := fmt.Sprintf("%s/repos/%s/%s", v3ep, owner, repo)
 	req, err := http.NewRequest(http.MethodGet, u, nil)
 	if err != nil {
 		return nil, err
