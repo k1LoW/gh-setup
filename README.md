@@ -26,7 +26,7 @@ $ tbls version
 ### Install
 
 ``` console
-$ gh extension install k1LoW/gh-grep
+$ gh extension install k1LoW/gh-setup
 ```
 
 ## As a GitHub Action
@@ -151,5 +151,5 @@ $ go install github.com/k1LoW/gh-setup@latest
 **docker:**
 
 ```console
-$ docker pull ghcr.io/k1low/gh-grep:latest
+$ docker pull ghcr.io/k1low/gh-setup:latest
 ```
