@@ -9,7 +9,7 @@ inputs:
     default: ${{ github.token }}
     required: false
   repo:
-    description: "Target repository [OWNER/REPO]"
+    description: "Target repository ([HOST/]OWNER/REPO)"
     required: true
   version:
     description: "Release version"
