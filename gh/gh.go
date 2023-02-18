@@ -19,10 +19,7 @@ import (
 	"time"
 
 	"github.com/cli/go-gh"
-	"github.com/cli/go-gh/pkg/api"
 	"github.com/cli/go-gh/pkg/repository"
-	"github.com/google/go-github/v50/github"
-	"github.com/k1LoW/go-github-client/v50/factory"
 	"github.com/nlepage/go-tarfs"
 )
 
@@ -47,6 +44,8 @@ var supportContentType = []string{
 	"application/octet-stream",
 }
 
+const versionLatest = "latest"
+
 type AssetOption struct {
 	Match   string
 	Version string
@@ -55,29 +54,24 @@ type AssetOption struct {
 	Strict  bool
 }
 
-func GetReleaseAsset(ctx context.Context, owner, repo string, opt *AssetOption) (*github.ReleaseAsset, fs.FS, error) {
-	const versionLatest = "latest"
-	c, err := client(ctx, owner, repo)
+func GetReleaseAsset(ctx context.Context, owner, repo string, opt *AssetOption) (*releaseAsset, fs.FS, error) {
+	c, err := newClient(ctx, owner, repo)
 	if err != nil {
 		return nil, nil, err
 	}
-	var r *github.RepositoryRelease
-	if opt != nil && (opt.Version == "" || opt.Version == versionLatest) {
-		r, _, err = c.Repositories.GetLatestRelease(ctx, owner, repo)
-		if err != nil {
-			return nil, nil, err
-		}
-	} else {
-		r, _, err = c.Repositories.GetReleaseByTag(ctx, owner, repo, opt.Version)
-		if err != nil {
-			return nil, nil, err
-		}
-	}
-	a, err := detectAsset(r.Assets, opt)
+	assets, err := c.getReleaseAssets(ctx, opt)
 	if err != nil {
 		return nil, nil, err
 	}
-	fsys, err := makeFS(owner, repo, a)
+	a, err := detectAsset(assets, opt)
+	if err != nil {
+		return nil, nil, err
+	}
+	b, err := c.downloadAsset(ctx, a)
+	if err != nil {
+		return nil, nil, err
+	}
+	fsys, err := makeFS(ctx, b, repo, a.Name, []string{a.ContentType, http.DetectContentType(b)})
 	if err != nil {
 		return nil, nil, err
 	}
@@ -106,7 +100,7 @@ func DetectHostOwnerRepo(ownerrepo string) (string, string, string, error) {
 	return host, owner, repo, nil
 }
 
-func detectAsset(assets []*github.ReleaseAsset, opt *AssetOption) (*github.ReleaseAsset, error) {
+func detectAsset(assets []*releaseAsset, opt *AssetOption) (*releaseAsset, error) {
 	var (
 		od, ad, om *regexp.Regexp
 		err        error
@@ -129,15 +123,15 @@ func detectAsset(assets []*github.ReleaseAsset, opt *AssetOption) (*github.Relea
 	}
 
 	type assetScore struct {
-		asset *github.ReleaseAsset
+		asset *releaseAsset
 		score int
 	}
 	assetScores := []*assetScore{}
 	for _, a := range assets {
-		if om != nil && om.MatchString(a.GetName()) {
+		if om != nil && om.MatchString(a.Name) {
 			return a, nil
 		}
-		if !contains(supportContentType, a.GetContentType()) {
+		if a.ContentType != "" && !contains(supportContentType, a.ContentType) {
 			continue
 		}
 		as := &assetScore{
@@ -146,19 +140,19 @@ func detectAsset(assets []*github.ReleaseAsset, opt *AssetOption) (*github.Relea
 		}
 		assetScores = append(assetScores, as)
 		// os
-		if od.MatchString(a.GetName()) {
+		if od.MatchString(a.Name) {
 			as.score += 7
 		}
 		// arch
-		if ad.MatchString(a.GetName()) {
+		if ad.MatchString(a.Name) {
 			as.score += 3
 		}
 		// content type
-		if a.GetContentType() == "application/octet-stream" {
+		if a.ContentType == "application/octet-stream" {
 			as.score += 1
 		}
 	}
-	if opt.Strict && om != nil {
+	if opt != nil && opt.Strict && om != nil {
 		return nil, fmt.Errorf("no matching assets found: %s", opt.Match)
 	}
 	if len(assetScores) == 0 {
@@ -169,7 +163,7 @@ func detectAsset(assets []*github.ReleaseAsset, opt *AssetOption) (*github.Relea
 		return assetScores[i].score > assetScores[j].score
 	})
 
-	if opt.Strict && assetScores[0].score < 10 {
+	if opt != nil && opt.Strict && assetScores[0].score < 10 {
 		return nil, fmt.Errorf("no matching assets found for OS/Arch: %s/%s", opt.OS, opt.Arch)
 	}
 
@@ -185,23 +179,27 @@ func getDictRegexp(key string, dict map[string][]string) *regexp.Regexp {
 	return regexp.MustCompile(fmt.Sprintf("(?i)(%s)", strings.ToLower(key)))
 }
 
-func makeFS(owner, repo string, a *github.ReleaseAsset) (fs.FS, error) {
-	b, err := downloadAsset(owner, repo, a)
-	if err != nil {
-		return nil, err
+func contains(s []string, e string) bool {
+	for _, v := range s {
+		if e == v {
+			return true
+		}
 	}
-	cts := []string{a.GetContentType(), http.DetectContentType(b)}
-	log.Println("asset content type:", cts)
+	return false
+}
+
+func makeFS(ctx context.Context, b []byte, repo, name string, contentTypes []string) (fs.FS, error) {
+	log.Println("asset content type:", contentTypes)
 	switch {
-	case matchContentTypes([]string{"application/zip", "application/x-zip-compressed"}, cts):
+	case matchContentTypes([]string{"application/zip", "application/x-zip-compressed"}, contentTypes):
 		return zip.NewReader(bytes.NewReader(b), int64(len(b)))
-	case matchContentTypes([]string{"application/gzip", "application/x-gzip"}, cts):
+	case matchContentTypes([]string{"application/gzip", "application/x-gzip"}, contentTypes):
 		gr, err := gzip.NewReader(bytes.NewReader(b))
 		if err != nil {
 			return nil, err
 		}
 		defer gr.Close()
-		if strings.HasSuffix(a.GetName(), ".tar.gz") {
+		if strings.HasSuffix(name, ".tar.gz") {
 			fsys, err := tarfs.New(gr)
 			if err != nil {
 				return nil, err
@@ -220,7 +218,7 @@ func makeFS(owner, repo string, a *github.ReleaseAsset) (fs.FS, error) {
 			}
 			return fsys, nil
 		}
-	case matchContentTypes([]string{"application/octet-stream"}, cts):
+	case matchContentTypes([]string{"application/octet-stream"}, contentTypes):
 		fsys := fstest.MapFS{}
 		fsys[repo] = &fstest.MapFile{
 			Data:    b,
@@ -229,93 +227,8 @@ func makeFS(owner, repo string, a *github.ReleaseAsset) (fs.FS, error) {
 		}
 		return fsys, nil
 	default:
-		return nil, fmt.Errorf("unsupport content type: %s", a.GetContentType())
+		return nil, fmt.Errorf("unsupport content types: %s", contentTypes)
 	}
-}
-
-func downloadAsset(owner, repo string, a *github.ReleaseAsset) ([]byte, error) {
-	client, err := httpClient(owner, repo)
-	if err != nil {
-		return nil, err
-	}
-	_, v3ep, _, _ := factory.GetTokenAndEndpoints()
-	u := fmt.Sprintf("%s/repos/%s/%s/releases/assets/%d", v3ep, owner, repo, a.GetID())
-	req, err := http.NewRequest(http.MethodGet, u, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("Accept", "application/octet-stream")
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	b, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	return b, nil
-}
-
-func contains(s []string, e string) bool {
-	for _, v := range s {
-		if e == v {
-			return true
-		}
-	}
-	return false
-}
-
-func client(ctx context.Context, owner, repo string) (*github.Client, error) {
-	token, _, _, _ := factory.GetTokenAndEndpoints()
-	if token == "" {
-		log.Println("No credentials found, access without credentials")
-		return factory.NewGithubClient(factory.SkipAuth(true))
-	}
-	log.Println("Access with credentials")
-	c, err := factory.NewGithubClient()
-	if err != nil {
-		return nil, err
-	}
-	if _, _, err := c.Repositories.Get(ctx, owner, repo); err != nil {
-		log.Println("Authentication failed, access without credentials")
-		return factory.NewGithubClient(factory.SkipAuth(true))
-	}
-	return c, nil
-}
-
-func httpClient(owner, repo string) (*http.Client, error) {
-	token, v3ep, _, _ := factory.GetTokenAndEndpoints()
-	if token == "" {
-		log.Println("No credentials found, access without credentials")
-		return &http.Client{
-			Timeout:   30 * time.Second,
-			Transport: http.DefaultTransport.(*http.Transport).Clone(),
-		}, nil
-	}
-	log.Println("Access with credentials")
-	client, err := gh.HTTPClient(&api.ClientOptions{})
-	if err != nil {
-		return nil, err
-	}
-	u := fmt.Sprintf("%s/repos/%s/%s", v3ep, owner, repo)
-	req, err := http.NewRequest(http.MethodGet, u, nil)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		log.Println("Authentication failed, access without credentials")
-		client = &http.Client{
-			Timeout:   30 * time.Second,
-			Transport: http.DefaultTransport.(*http.Transport).Clone(),
-		}
-	}
-	return client, nil
 }
 
 func matchContentTypes(m, ct []string) bool {
