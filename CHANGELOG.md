@@ -1,5 +1,8 @@
 # Changelog
 
+## [v1.1.2](https://github.com/k1LoW/gh-setup/compare/v1.1.1...v1.1.2) - 2023-02-18
+- Fix go.sum by @k1LoW in https://github.com/k1LoW/gh-setup/pull/58
+
 ## [v1.1.1](https://github.com/k1LoW/gh-setup/compare/v1.1.0...v1.1.1) - 2023-02-18
 - Update pkgs by @k1LoW in https://github.com/k1LoW/gh-setup/pull/56
 
