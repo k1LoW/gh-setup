@@ -62,7 +62,7 @@ func GetReleaseAsset(ctx context.Context, owner, repo string, opt *AssetOption) 
 		return nil, nil, err
 	}
 	var r *github.RepositoryRelease
-	if opt != nil && (opt.Version == "" || opt.Version == versionLatest) {
+	if opt == nil || (opt.Version == "" || opt.Version == versionLatest) {
 		r, _, err = c.gc.Repositories.GetLatestRelease(ctx, owner, repo)
 		if err != nil {
 			return nil, nil, err
@@ -162,7 +162,7 @@ func detectAsset(assets []*github.ReleaseAsset, opt *AssetOption) (*github.Relea
 			as.score += 1
 		}
 	}
-	if opt.Strict && om != nil {
+	if opt != nil && opt.Strict && om != nil {
 		return nil, fmt.Errorf("no matching assets found: %s", opt.Match)
 	}
 	if len(assetScores) == 0 {
@@ -173,7 +173,7 @@ func detectAsset(assets []*github.ReleaseAsset, opt *AssetOption) (*github.Relea
 		return assetScores[i].score > assetScores[j].score
 	})
 
-	if opt.Strict && assetScores[0].score < 10 {
+	if opt != nil && opt.Strict && assetScores[0].score < 10 {
 		return nil, fmt.Errorf("no matching assets found for OS/Arch: %s/%s", opt.OS, opt.Arch)
 	}
 
