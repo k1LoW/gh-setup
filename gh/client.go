@@ -184,7 +184,7 @@ func (c *client) getReleaseAssetsViaURL(ctx context.Context, url string) ([]*rel
 			splitted := strings.Split(line, `href="`)
 			if len(splitted) == 2 {
 				splitted2 := strings.Split(splitted[1], `"`)
-				u := fmt.Sprintf(fmt.Sprintf("https://github.com%s", splitted2[0]))
+				u := fmt.Sprintf("https://github.com%s", splitted2[0])
 				splitted3 := strings.Split(splitted2[0], "/")
 				name := splitted3[len(splitted3)-1]
 				assets = append(assets, &releaseAsset{
