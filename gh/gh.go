@@ -57,18 +57,18 @@ type AssetOption struct {
 
 func GetReleaseAsset(ctx context.Context, owner, repo string, opt *AssetOption) (*github.ReleaseAsset, fs.FS, error) {
 	const versionLatest = "latest"
-	c, err := client(ctx, owner, repo)
+	c, err := newClient(ctx, owner, repo)
 	if err != nil {
 		return nil, nil, err
 	}
 	var r *github.RepositoryRelease
 	if opt != nil && (opt.Version == "" || opt.Version == versionLatest) {
-		r, _, err = c.Repositories.GetLatestRelease(ctx, owner, repo)
+		r, _, err = c.gc.Repositories.GetLatestRelease(ctx, owner, repo)
 		if err != nil {
 			return nil, nil, err
 		}
 	} else {
-		r, _, err = c.Repositories.GetReleaseByTag(ctx, owner, repo, opt.Version)
+		r, _, err = c.gc.Repositories.GetReleaseByTag(ctx, owner, repo, opt.Version)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -77,7 +77,11 @@ func GetReleaseAsset(ctx context.Context, owner, repo string, opt *AssetOption) 
 	if err != nil {
 		return nil, nil, err
 	}
-	fsys, err := makeFS(owner, repo, a)
+	b, err := c.downloadAsset(ctx, a)
+	if err != nil {
+		return nil, nil, err
+	}
+	fsys, err := makeFS(ctx, b, repo, a.GetName(), []string{a.GetContentType(), http.DetectContentType(b)})
 	if err != nil {
 		return nil, nil, err
 	}
@@ -185,23 +189,85 @@ func getDictRegexp(key string, dict map[string][]string) *regexp.Regexp {
 	return regexp.MustCompile(fmt.Sprintf("(?i)(%s)", strings.ToLower(key)))
 }
 
-func makeFS(owner, repo string, a *github.ReleaseAsset) (fs.FS, error) {
-	b, err := downloadAsset(owner, repo, a)
+func contains(s []string, e string) bool {
+	for _, v := range s {
+		if e == v {
+			return true
+		}
+	}
+	return false
+}
+
+type client struct {
+	gc    *github.Client
+	hc    *http.Client
+	owner string
+	repo  string
+	token string
+	v3ep  string
+}
+
+func newClient(ctx context.Context, owner, repo string) (*client, error) {
+	token, v3ep, _, _ := factory.GetTokenAndEndpoints()
+	if token == "" {
+		log.Println("No credentials found, access without credentials")
+		return newNoAuthClient(ctx, owner, repo, v3ep)
+	}
+	log.Println("Access with credentials")
+	gc, err := factory.NewGithubClient(factory.SkipAuth(true))
 	if err != nil {
 		return nil, err
 	}
-	cts := []string{a.GetContentType(), http.DetectContentType(b)}
-	log.Println("asset content type:", cts)
+	if _, _, err := gc.Repositories.Get(ctx, owner, repo); err != nil {
+		log.Println("Authentication failed, access without credentials")
+		return newNoAuthClient(ctx, owner, repo, v3ep)
+	}
+	hc, err := gh.HTTPClient(&api.ClientOptions{})
+	if err != nil {
+		return nil, err
+	}
+	c := &client{
+		owner: owner,
+		repo:  repo,
+		token: token,
+		v3ep:  v3ep,
+		gc:    gc,
+		hc:    hc,
+	}
+	return c, nil
+}
+
+func newNoAuthClient(ctx context.Context, owner, repo, v3ep string) (*client, error) {
+	gc, err := factory.NewGithubClient(factory.SkipAuth(true))
+	if err != nil {
+		return nil, err
+	}
+	hc := &http.Client{
+		Timeout:   30 * time.Second,
+		Transport: http.DefaultTransport.(*http.Transport).Clone(),
+	}
+	c := &client{
+		owner: owner,
+		repo:  repo,
+		v3ep:  v3ep,
+		gc:    gc,
+		hc:    hc,
+	}
+	return c, nil
+}
+
+func makeFS(ctx context.Context, b []byte, repo, name string, contentTypes []string) (fs.FS, error) {
+	log.Println("asset content type:", contentTypes)
 	switch {
-	case matchContentTypes([]string{"application/zip", "application/x-zip-compressed"}, cts):
+	case matchContentTypes([]string{"application/zip", "application/x-zip-compressed"}, contentTypes):
 		return zip.NewReader(bytes.NewReader(b), int64(len(b)))
-	case matchContentTypes([]string{"application/gzip", "application/x-gzip"}, cts):
+	case matchContentTypes([]string{"application/gzip", "application/x-gzip"}, contentTypes):
 		gr, err := gzip.NewReader(bytes.NewReader(b))
 		if err != nil {
 			return nil, err
 		}
 		defer gr.Close()
-		if strings.HasSuffix(a.GetName(), ".tar.gz") {
+		if strings.HasSuffix(name, ".tar.gz") {
 			fsys, err := tarfs.New(gr)
 			if err != nil {
 				return nil, err
@@ -220,7 +286,7 @@ func makeFS(owner, repo string, a *github.ReleaseAsset) (fs.FS, error) {
 			}
 			return fsys, nil
 		}
-	case matchContentTypes([]string{"application/octet-stream"}, cts):
+	case matchContentTypes([]string{"application/octet-stream"}, contentTypes):
 		fsys := fstest.MapFS{}
 		fsys[repo] = &fstest.MapFile{
 			Data:    b,
@@ -229,23 +295,18 @@ func makeFS(owner, repo string, a *github.ReleaseAsset) (fs.FS, error) {
 		}
 		return fsys, nil
 	default:
-		return nil, fmt.Errorf("unsupport content type: %s", a.GetContentType())
+		return nil, fmt.Errorf("unsupport content types: %s", contentTypes)
 	}
 }
 
-func downloadAsset(owner, repo string, a *github.ReleaseAsset) ([]byte, error) {
-	client, err := httpClient(owner, repo)
-	if err != nil {
-		return nil, err
-	}
-	_, v3ep, _, _ := factory.GetTokenAndEndpoints()
-	u := fmt.Sprintf("%s/repos/%s/%s/releases/assets/%d", v3ep, owner, repo, a.GetID())
-	req, err := http.NewRequest(http.MethodGet, u, nil)
+func (c *client) downloadAsset(ctx context.Context, a *github.ReleaseAsset) ([]byte, error) {
+	u := fmt.Sprintf("%s/repos/%s/%s/releases/assets/%d", c.v3ep, c.owner, c.repo, a.GetID())
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
 	if err != nil {
 		return nil, err
 	}
 	req.Header.Add("Accept", "application/octet-stream")
-	resp, err := client.Do(req)
+	resp, err := c.hc.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -255,67 +316,6 @@ func downloadAsset(owner, repo string, a *github.ReleaseAsset) ([]byte, error) {
 		return nil, err
 	}
 	return b, nil
-}
-
-func contains(s []string, e string) bool {
-	for _, v := range s {
-		if e == v {
-			return true
-		}
-	}
-	return false
-}
-
-func client(ctx context.Context, owner, repo string) (*github.Client, error) {
-	token, _, _, _ := factory.GetTokenAndEndpoints()
-	if token == "" {
-		log.Println("No credentials found, access without credentials")
-		return factory.NewGithubClient(factory.SkipAuth(true))
-	}
-	log.Println("Access with credentials")
-	c, err := factory.NewGithubClient()
-	if err != nil {
-		return nil, err
-	}
-	if _, _, err := c.Repositories.Get(ctx, owner, repo); err != nil {
-		log.Println("Authentication failed, access without credentials")
-		return factory.NewGithubClient(factory.SkipAuth(true))
-	}
-	return c, nil
-}
-
-func httpClient(owner, repo string) (*http.Client, error) {
-	token, v3ep, _, _ := factory.GetTokenAndEndpoints()
-	if token == "" {
-		log.Println("No credentials found, access without credentials")
-		return &http.Client{
-			Timeout:   30 * time.Second,
-			Transport: http.DefaultTransport.(*http.Transport).Clone(),
-		}, nil
-	}
-	log.Println("Access with credentials")
-	client, err := gh.HTTPClient(&api.ClientOptions{})
-	if err != nil {
-		return nil, err
-	}
-	u := fmt.Sprintf("%s/repos/%s/%s", v3ep, owner, repo)
-	req, err := http.NewRequest(http.MethodGet, u, nil)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		log.Println("Authentication failed, access without credentials")
-		client = &http.Client{
-			Timeout:   30 * time.Second,
-			Transport: http.DefaultTransport.(*http.Transport).Clone(),
-		}
-	}
-	return client, nil
 }
 
 func matchContentTypes(m, ct []string) bool {
