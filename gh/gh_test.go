@@ -3,10 +3,16 @@ package gh
 import (
 	"context"
 	"io/fs"
+	"os"
 	"testing"
 
 	"github.com/k1LoW/go-github-client/v50/factory"
 )
+
+func TestMain(m *testing.M) {
+	os.Setenv("GH_CONFIG_DIR", "/tmp") // Disable reading credentials from config
+	m.Run()
+}
 
 func TestGetReleaseAsset(t *testing.T) {
 	tests := []struct {
@@ -22,7 +28,6 @@ func TestGetReleaseAsset(t *testing.T) {
 		{"k1LoW", "tbls", &AssetOption{Version: "v1.60.0"}, "tbls", false},
 	}
 	ctx := context.Background()
-	t.Setenv("GH_CONFIG_DIR", "/tmp")
 	token, _, _, _ := factory.GetTokenAndEndpoints()
 	for _, tt := range tests {
 		if tt.useToken {

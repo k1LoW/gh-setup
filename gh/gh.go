@@ -131,7 +131,7 @@ func detectAsset(assets []*releaseAsset, opt *AssetOption) (*releaseAsset, error
 		if om != nil && om.MatchString(a.Name) {
 			return a, nil
 		}
-		if !contains(supportContentType, a.ContentType) {
+		if a.ContentType != "" && !contains(supportContentType, a.ContentType) {
 			continue
 		}
 		as := &assetScore{
