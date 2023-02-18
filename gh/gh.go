@@ -19,10 +19,7 @@ import (
 	"time"
 
 	"github.com/cli/go-gh"
-	"github.com/cli/go-gh/pkg/api"
 	"github.com/cli/go-gh/pkg/repository"
-	"github.com/google/go-github/v50/github"
-	"github.com/k1LoW/go-github-client/v50/factory"
 	"github.com/nlepage/go-tarfs"
 )
 
@@ -47,6 +44,8 @@ var supportContentType = []string{
 	"application/octet-stream",
 }
 
+const versionLatest = "latest"
+
 type AssetOption struct {
 	Match   string
 	Version string
@@ -55,25 +54,16 @@ type AssetOption struct {
 	Strict  bool
 }
 
-func GetReleaseAsset(ctx context.Context, owner, repo string, opt *AssetOption) (*github.ReleaseAsset, fs.FS, error) {
-	const versionLatest = "latest"
+func GetReleaseAsset(ctx context.Context, owner, repo string, opt *AssetOption) (*releaseAsset, fs.FS, error) {
 	c, err := newClient(ctx, owner, repo)
 	if err != nil {
 		return nil, nil, err
 	}
-	var r *github.RepositoryRelease
-	if opt == nil || (opt.Version == "" || opt.Version == versionLatest) {
-		r, _, err = c.gc.Repositories.GetLatestRelease(ctx, owner, repo)
-		if err != nil {
-			return nil, nil, err
-		}
-	} else {
-		r, _, err = c.gc.Repositories.GetReleaseByTag(ctx, owner, repo, opt.Version)
-		if err != nil {
-			return nil, nil, err
-		}
+	assets, err := c.getReleaseAssets(ctx, opt)
+	if err != nil {
+		return nil, nil, err
 	}
-	a, err := detectAsset(r.Assets, opt)
+	a, err := detectAsset(assets, opt)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -81,7 +71,7 @@ func GetReleaseAsset(ctx context.Context, owner, repo string, opt *AssetOption) 
 	if err != nil {
 		return nil, nil, err
 	}
-	fsys, err := makeFS(ctx, b, repo, a.GetName(), []string{a.GetContentType(), http.DetectContentType(b)})
+	fsys, err := makeFS(ctx, b, repo, a.Name, []string{a.ContentType, http.DetectContentType(b)})
 	if err != nil {
 		return nil, nil, err
 	}
@@ -110,7 +100,7 @@ func DetectHostOwnerRepo(ownerrepo string) (string, string, string, error) {
 	return host, owner, repo, nil
 }
 
-func detectAsset(assets []*github.ReleaseAsset, opt *AssetOption) (*github.ReleaseAsset, error) {
+func detectAsset(assets []*releaseAsset, opt *AssetOption) (*releaseAsset, error) {
 	var (
 		od, ad, om *regexp.Regexp
 		err        error
@@ -133,15 +123,15 @@ func detectAsset(assets []*github.ReleaseAsset, opt *AssetOption) (*github.Relea
 	}
 
 	type assetScore struct {
-		asset *github.ReleaseAsset
+		asset *releaseAsset
 		score int
 	}
 	assetScores := []*assetScore{}
 	for _, a := range assets {
-		if om != nil && om.MatchString(a.GetName()) {
+		if om != nil && om.MatchString(a.Name) {
 			return a, nil
 		}
-		if !contains(supportContentType, a.GetContentType()) {
+		if !contains(supportContentType, a.ContentType) {
 			continue
 		}
 		as := &assetScore{
@@ -150,15 +140,15 @@ func detectAsset(assets []*github.ReleaseAsset, opt *AssetOption) (*github.Relea
 		}
 		assetScores = append(assetScores, as)
 		// os
-		if od.MatchString(a.GetName()) {
+		if od.MatchString(a.Name) {
 			as.score += 7
 		}
 		// arch
-		if ad.MatchString(a.GetName()) {
+		if ad.MatchString(a.Name) {
 			as.score += 3
 		}
 		// content type
-		if a.GetContentType() == "application/octet-stream" {
+		if a.ContentType == "application/octet-stream" {
 			as.score += 1
 		}
 	}
@@ -196,64 +186,6 @@ func contains(s []string, e string) bool {
 		}
 	}
 	return false
-}
-
-type client struct {
-	gc    *github.Client
-	hc    *http.Client
-	owner string
-	repo  string
-	token string
-	v3ep  string
-}
-
-func newClient(ctx context.Context, owner, repo string) (*client, error) {
-	token, v3ep, _, _ := factory.GetTokenAndEndpoints()
-	if token == "" {
-		log.Println("No credentials found, access without credentials")
-		return newNoAuthClient(ctx, owner, repo, v3ep)
-	}
-	log.Println("Access with credentials")
-	gc, err := factory.NewGithubClient(factory.SkipAuth(true))
-	if err != nil {
-		return nil, err
-	}
-	if _, _, err := gc.Repositories.Get(ctx, owner, repo); err != nil {
-		log.Println("Authentication failed, access without credentials")
-		return newNoAuthClient(ctx, owner, repo, v3ep)
-	}
-	hc, err := gh.HTTPClient(&api.ClientOptions{})
-	if err != nil {
-		return nil, err
-	}
-	c := &client{
-		owner: owner,
-		repo:  repo,
-		token: token,
-		v3ep:  v3ep,
-		gc:    gc,
-		hc:    hc,
-	}
-	return c, nil
-}
-
-func newNoAuthClient(ctx context.Context, owner, repo, v3ep string) (*client, error) {
-	gc, err := factory.NewGithubClient(factory.SkipAuth(true))
-	if err != nil {
-		return nil, err
-	}
-	hc := &http.Client{
-		Timeout:   30 * time.Second,
-		Transport: http.DefaultTransport.(*http.Transport).Clone(),
-	}
-	c := &client{
-		owner: owner,
-		repo:  repo,
-		v3ep:  v3ep,
-		gc:    gc,
-		hc:    hc,
-	}
-	return c, nil
 }
 
 func makeFS(ctx context.Context, b []byte, repo, name string, contentTypes []string) (fs.FS, error) {
@@ -297,25 +229,6 @@ func makeFS(ctx context.Context, b []byte, repo, name string, contentTypes []str
 	default:
 		return nil, fmt.Errorf("unsupport content types: %s", contentTypes)
 	}
-}
-
-func (c *client) downloadAsset(ctx context.Context, a *github.ReleaseAsset) ([]byte, error) {
-	u := fmt.Sprintf("%s/repos/%s/%s/releases/assets/%d", c.v3ep, c.owner, c.repo, a.GetID())
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("Accept", "application/octet-stream")
-	resp, err := c.hc.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	b, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	return b, nil
 }
 
 func matchContentTypes(m, ct []string) bool {

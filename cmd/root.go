@@ -72,13 +72,13 @@ var rootCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		cmd.Printf("Use %s\n", a.GetName())
+		cmd.Printf("Use %s\n", a.Name)
 		m, err := setup.Bin(fsys, sOpt)
 		if err != nil {
 			return err
 		}
 		if len(m) == 0 {
-			return fmt.Errorf("setup failed: %s", a.GetName())
+			return fmt.Errorf("setup failed: %s", a.Name)
 		}
 		cmd.Println("Setup binaries to executable path (PATH):")
 		for b, bp := range m {
