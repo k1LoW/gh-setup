@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.1.0](https://github.com/k1LoW/gh-setup/compare/v1.0.1...v1.1.0) - 2023-02-18
+- bump golang.org/x/net from 0.5.0 to 0.7.0 by @dependabot in https://github.com/k1LoW/gh-setup/pull/55
+- Fix GitHub client by @k1LoW in https://github.com/k1LoW/gh-setup/pull/54
+
 ## [v1.0.1](https://github.com/k1LoW/gh-setup/compare/v1.0.0...v1.0.1) - 2023-02-16
 - Fix checking token by @k1LoW in https://github.com/k1LoW/gh-setup/pull/52
 
