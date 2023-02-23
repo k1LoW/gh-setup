@@ -105,12 +105,12 @@ func setLogger(verbose bool) {
 		logger = slog.New(slog.HandlerOptions{
 			AddSource: true,
 			Level:     slog.LevelDebug,
-		}.NewJSONHandler(os.Stderr))
+		}.NewTextHandler(os.Stderr))
 	case verbose:
 		logger = slog.New(slog.HandlerOptions{
 			AddSource: false,
 			Level:     slog.LevelInfo,
-		}.NewJSONHandler(os.Stderr))
+		}.NewTextHandler(os.Stderr))
 	}
 	slog.SetDefault(logger)
 }
