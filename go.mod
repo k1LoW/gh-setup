@@ -10,6 +10,7 @@ require (
 	github.com/k1LoW/go-github-client/v50 v50.0.6
 	github.com/nlepage/go-tarfs v1.1.0
 	github.com/spf13/cobra v1.6.1
+	golang.org/x/exp v0.0.0-20230213192124-5e25df0256eb
 )
 
 require (

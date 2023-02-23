@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -16,6 +15,7 @@ import (
 	"github.com/cli/go-gh/pkg/api"
 	"github.com/google/go-github/v50/github"
 	"github.com/k1LoW/go-github-client/v50/factory"
+	"golang.org/x/exp/slog"
 )
 
 type releaseAsset struct {
@@ -42,16 +42,16 @@ const (
 func newClient(ctx context.Context, owner, repo string) (*client, error) {
 	token, v3ep, _, _ := factory.GetTokenAndEndpoints()
 	if token == "" {
-		log.Println("No credentials found, access without credentials")
+		slog.Info("No credentials found, access without credentials", slog.String("endpoint", v3ep), slog.String("owner", owner), slog.String("repo", repo))
 		return newNoAuthClient(ctx, owner, repo, v3ep)
 	}
-	log.Println("Access with credentials")
+	slog.Info("Access with credentials", slog.String("endpoint", v3ep), slog.String("owner", owner), slog.String("repo", repo))
 	gc, err := factory.NewGithubClient(factory.SkipAuth(true))
 	if err != nil {
 		return nil, err
 	}
 	if _, _, err := gc.Repositories.Get(ctx, owner, repo); err != nil {
-		log.Println("Authentication failed, access without credentials")
+		slog.Info("Authentication failed, access without credentials", slog.String("endpoint", v3ep), slog.String("owner", owner), slog.String("repo", repo))
 		return newNoAuthClient(ctx, owner, repo, v3ep)
 	}
 	hc, err := gh.HTTPClient(&api.ClientOptions{})
@@ -99,12 +99,13 @@ func (c *client) getReleaseAssets(ctx context.Context, opt *AssetOption) ([]*rel
 }
 
 func (c *client) getReleaseAssetsWithoutAPI(ctx context.Context, opt *AssetOption) ([]*releaseAsset, error) {
+	slog.Info("Get assets directly from the GitHub WebUI")
 	if c.v3ep != defaultV3Endpoint {
-		return nil, fmt.Errorf("not support for non API access: %s", c.v3ep)
+		return nil, fmt.Errorf("not support for non-API access: %s", c.v3ep)
 	}
 	page := 1
 	for {
-		urls, err := c.getReleaseAssetsURL(ctx, page)
+		urls, err := c.getReleaseAssetsURLs(ctx, page)
 		if err != nil {
 			return nil, err
 		}
@@ -125,7 +126,7 @@ func (c *client) getReleaseAssetsWithoutAPI(ctx context.Context, opt *AssetOptio
 	return nil, errors.New("no assets found")
 }
 
-func (c *client) getReleaseAssetsURL(ctx context.Context, page int) ([]string, error) {
+func (c *client) getReleaseAssetsURLs(ctx context.Context, page int) ([]string, error) {
 	u := fmt.Sprintf("https://github.com/%s/%s/releases?page=%d", c.owner, c.repo, page)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
 	if err != nil {
@@ -201,6 +202,7 @@ func (c *client) getReleaseAssetsViaURL(ctx context.Context, url string) ([]*rel
 }
 
 func (c *client) getReleaseAssetsWithAPI(ctx context.Context, opt *AssetOption) ([]*releaseAsset, error) {
+	slog.Info("Get assets using the GitHub API")
 	var (
 		r   *github.RepositoryRelease
 		err error
@@ -239,6 +241,7 @@ func (c *client) downloadAsset(ctx context.Context, a *releaseAsset) ([]byte, er
 }
 
 func (c *client) downloadAssetWithoutAPI(ctx context.Context, a *releaseAsset) ([]byte, error) {
+	slog.Info("Download asset directly from the GitHub WebUI")
 	if a.DownloadURL == "" {
 		return nil, errors.New("empty download URL")
 	}
@@ -261,6 +264,7 @@ func (c *client) downloadAssetWithoutAPI(ctx context.Context, a *releaseAsset) (
 }
 
 func (c *client) downloadAssetWithAPI(ctx context.Context, a *releaseAsset) ([]byte, error) {
+	slog.Info("Download asset using the GitHub API")
 	u := fmt.Sprintf("%s/repos/%s/%s/releases/assets/%d", c.v3ep, c.owner, c.repo, a.ID)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
 	if err != nil {
