@@ -20,6 +20,7 @@ import (
 	"github.com/cli/go-gh"
 	"github.com/cli/go-gh/pkg/repository"
 	"github.com/nlepage/go-tarfs"
+	"golang.org/x/exp/slog"
 )
 
 var osDict = map[string][]string{
@@ -100,6 +101,7 @@ func DetectHostOwnerRepo(ownerrepo string) (string, string, string, error) {
 }
 
 func detectAsset(assets []*releaseAsset, opt *AssetOption) (*releaseAsset, error) {
+	slog.Info("Detect the most appropriate asset from all assets")
 	var (
 		od, ad, om *regexp.Regexp
 		err        error
@@ -128,9 +130,11 @@ func detectAsset(assets []*releaseAsset, opt *AssetOption) (*releaseAsset, error
 	assetScores := []*assetScore{}
 	for _, a := range assets {
 		if om != nil && om.MatchString(a.Name) {
+			slog.Info("Select unconditionally because it matched --match", slog.String("name", a.Name), slog.String("match", om.String()))
 			return a, nil
 		}
 		if a.ContentType != "" && !contains(supportContentType, a.ContentType) {
+			slog.Info("Skip", slog.String("Reason", "Unsupported content type"), slog.String("content type", a.ContentType), slog.String("support content type", fmt.Sprintf("%v", supportContentType)))
 			continue
 		}
 		as := &assetScore{
@@ -150,6 +154,9 @@ func detectAsset(assets []*releaseAsset, opt *AssetOption) (*releaseAsset, error
 		if a.ContentType == "application/octet-stream" {
 			as.score += 1
 		}
+		if opt != nil && opt.Strict && om != nil {
+			slog.Info("Set score", slog.String("name", a.Name), slog.Int("score", as.score))
+		}
 	}
 	if opt != nil && opt.Strict && om != nil {
 		return nil, fmt.Errorf("no matching assets found: %s", opt.Match)
@@ -165,7 +172,7 @@ func detectAsset(assets []*releaseAsset, opt *AssetOption) (*releaseAsset, error
 	if opt != nil && opt.Strict && assetScores[0].score < 10 {
 		return nil, fmt.Errorf("no matching assets found for OS/Arch: %s/%s", opt.OS, opt.Arch)
 	}
-
+	slog.Info("Select the one with the highest score", slog.String("name", assetScores[0].asset.Name), slog.Int("score", assetScores[0].score))
 	return assetScores[0].asset, nil
 }
 

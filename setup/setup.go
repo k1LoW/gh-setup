@@ -56,12 +56,13 @@ func Bin(fsys fs.FS, opt *Option) (map[string]string, error) {
 		}
 		if bm != nil {
 			if !bm.MatchString(path) {
-				slog.Info("No match", slog.String("path", path), slog.String("match", bm.String()))
+				slog.Info("Skip", slog.String("Reason", "No match for --bin-match"), slog.String("path", path), slog.String("match", bm.String()))
 				return nil
 			}
 		} else {
 			for _, i := range ignoreBinnameKeywords {
 				if strings.Contains(filepath.ToSlash(strings.ToLower(path)), filepath.ToSlash(strings.ToLower(i))) {
+					slog.Info("Skip", slog.String("Reason", "Matched the ignore filename keywords"), slog.String("path", path), slog.String("list", fmt.Sprintf("%v", ignoreBinnameKeywords)))
 					return nil
 				}
 			}
@@ -72,22 +73,26 @@ func Bin(fsys fs.FS, opt *Option) (map[string]string, error) {
 			return err
 		}
 
-		if isBinary(b) {
-			slog.Info("Determine as a binary file", slog.String("path", path))
-			perm := "0755"
-			perm32, err := strconv.ParseUint(perm, 8, 32)
-			if err != nil {
-				return err
-			}
-			bp := filepath.Join(bd, filepath.Base(path))
-			if _, err := os.Stat(bp); err == nil && !force {
-				return fmt.Errorf("%s already exist", bp)
-			}
-			if err := os.WriteFile(bp, b, os.FileMode(perm32)); err != nil {
-				return err
-			}
-			m[path] = bp
+		if !isBinary(b) {
+			slog.Info("Skip", slog.String("Reason", "Not determined to be a binary file"), slog.String("path", path))
+			return nil
 		}
+
+		slog.Info("Determine as a binary file", slog.String("path", path))
+		perm := "0755"
+		perm32, err := strconv.ParseUint(perm, 8, 32)
+		if err != nil {
+			return err
+		}
+		bp := filepath.Join(bd, filepath.Base(path))
+		slog.Info("Write file", slog.String("bin path", bp))
+		if _, err := os.Stat(bp); err == nil && !force {
+			return fmt.Errorf("%s already exist", bp)
+		}
+		if err := os.WriteFile(bp, b, os.FileMode(perm32)); err != nil {
+			return err
+		}
+		m[path] = bp
 		return nil
 	}); err != nil {
 		return nil, err
