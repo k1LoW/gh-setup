@@ -39,9 +39,9 @@ $ gh extension install k1LoW/gh-setup
     steps:
       -
         name: Setup k1LoW/tbls
-        run: k1LoW/gh-setup@v1
+        uses: k1LoW/gh-setup@v1
         with:
-          github-token: ${secrets.GITHUB_TOKEN}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           repo: k1LoW/tbls
         # version: v1.60.0
         # os: linux
