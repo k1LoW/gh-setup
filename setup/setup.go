@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -14,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/h2non/filetype"
+	"golang.org/x/exp/slog"
 )
 
 type Option struct {
@@ -47,7 +47,7 @@ func Bin(fsys fs.FS, opt *Option) (map[string]string, error) {
 		}
 	}
 	if err := fs.WalkDir(fsys, ".", func(path string, d fs.DirEntry, err error) error {
-		log.Println("extract file:", path)
+		slog.Info("Extract target", slog.String("path", path))
 		if err != nil {
 			return err
 		}
@@ -56,6 +56,7 @@ func Bin(fsys fs.FS, opt *Option) (map[string]string, error) {
 		}
 		if bm != nil {
 			if !bm.MatchString(path) {
+				slog.Info("No match", slog.String("path", path), slog.String("match", bm.String()))
 				return nil
 			}
 		} else {
@@ -72,6 +73,7 @@ func Bin(fsys fs.FS, opt *Option) (map[string]string, error) {
 		}
 
 		if isBinary(b) {
+			slog.Info("Determine as a binary file", slog.String("path", path))
 			perm := "0755"
 			perm32, err := strconv.ParseUint(perm, 8, 32)
 			if err != nil {
@@ -188,7 +190,7 @@ func isBinary(b []byte) bool {
 	// FIXME: On Windows, it can't be detected at all.
 	const binaryContentType = "application/octet-stream"
 	contentType := http.DetectContentType(b)
-	log.Println("content type:", contentType)
+	slog.Info("Detect content type", slog.String("content type", contentType))
 	if contentType == binaryContentType {
 		return true
 	}
@@ -196,6 +198,6 @@ func isBinary(b []byte) bool {
 	if err != nil {
 		return false
 	}
-	log.Printf("file type: %v\n", typ)
+	slog.Info("Detect file type", slog.String("file type", fmt.Sprintf("%v", typ)))
 	return typ == filetype.Unknown
 }

@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"log"
 	"net/http"
 	"regexp"
 	"runtime"
@@ -189,7 +188,6 @@ func contains(s []string, e string) bool {
 }
 
 func makeFS(ctx context.Context, b []byte, repo, name string, contentTypes []string) (fs.FS, error) {
-	log.Println("asset content type:", contentTypes)
 	switch {
 	case matchContentTypes([]string{"application/zip", "application/x-zip-compressed"}, contentTypes):
 		return zip.NewReader(bytes.NewReader(b), int64(len(b)))

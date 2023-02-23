@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -16,6 +15,7 @@ import (
 	"github.com/cli/go-gh/pkg/api"
 	"github.com/google/go-github/v50/github"
 	"github.com/k1LoW/go-github-client/v50/factory"
+	"golang.org/x/exp/slog"
 )
 
 type releaseAsset struct {
@@ -42,16 +42,16 @@ const (
 func newClient(ctx context.Context, owner, repo string) (*client, error) {
 	token, v3ep, _, _ := factory.GetTokenAndEndpoints()
 	if token == "" {
-		log.Println("No credentials found, access without credentials")
+		slog.Info("No credentials found, access without credentials", slog.String("endpoint", v3ep), slog.String("owner", owner), slog.String("repo", repo))
 		return newNoAuthClient(ctx, owner, repo, v3ep)
 	}
-	log.Println("Access with credentials")
+	slog.Info("Access with credentials", slog.String("endpoint", v3ep), slog.String("owner", owner), slog.String("repo", repo))
 	gc, err := factory.NewGithubClient(factory.SkipAuth(true))
 	if err != nil {
 		return nil, err
 	}
 	if _, _, err := gc.Repositories.Get(ctx, owner, repo); err != nil {
-		log.Println("Authentication failed, access without credentials")
+		slog.Info("Authentication failed, access without credentials", slog.String("endpoint", v3ep), slog.String("owner", owner), slog.String("repo", repo))
 		return newNoAuthClient(ctx, owner, repo, v3ep)
 	}
 	hc, err := gh.HTTPClient(&api.ClientOptions{})
@@ -100,7 +100,7 @@ func (c *client) getReleaseAssets(ctx context.Context, opt *AssetOption) ([]*rel
 
 func (c *client) getReleaseAssetsWithoutAPI(ctx context.Context, opt *AssetOption) ([]*releaseAsset, error) {
 	if c.v3ep != defaultV3Endpoint {
-		return nil, fmt.Errorf("not support for non API access: %s", c.v3ep)
+		return nil, fmt.Errorf("not support for non-API access: %s", c.v3ep)
 	}
 	page := 1
 	for {

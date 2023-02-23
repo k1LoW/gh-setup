@@ -26,20 +26,21 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"os"
 
 	"github.com/k1LoW/gh-setup/gh"
 	"github.com/k1LoW/gh-setup/setup"
 	"github.com/k1LoW/gh-setup/version"
 	"github.com/spf13/cobra"
+	"golang.org/x/exp/slog"
 )
 
 var ownerrepo string
 
 var (
-	opt  = &gh.AssetOption{}
-	sOpt = &setup.Option{}
+	opt     = &gh.AssetOption{}
+	sOpt    = &setup.Option{}
+	verbose bool
 )
 
 var rootCmd = &cobra.Command{
@@ -54,6 +55,7 @@ var rootCmd = &cobra.Command{
 			return nil
 		}
 		ctx := context.Background()
+		setLogger(verbose)
 		host, owner, repo, err := gh.DetectHostOwnerRepo(ownerrepo)
 		if err != nil {
 			return err
@@ -91,15 +93,26 @@ var rootCmd = &cobra.Command{
 func Execute() {
 	rootCmd.SetOut(os.Stdout)
 	rootCmd.SetErr(os.Stderr)
-
-	log.SetOutput(io.Discard)
-	if env := os.Getenv("DEBUG"); env != "" {
-		log.SetOutput(os.Stderr)
-	}
-
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
+}
+
+func setLogger(verbose bool) {
+	logger := slog.New(slog.NewTextHandler(io.Discard))
+	switch {
+	case os.Getenv("DEBUG") != "":
+		logger = slog.New(slog.HandlerOptions{
+			AddSource: true,
+			Level:     slog.LevelDebug,
+		}.NewJSONHandler(os.Stderr))
+	case verbose:
+		logger = slog.New(slog.HandlerOptions{
+			AddSource: false,
+			Level:     slog.LevelInfo,
+		}.NewJSONHandler(os.Stderr))
+	}
+	slog.SetDefault(logger)
 }
 
 func init() {
@@ -112,4 +125,5 @@ func init() {
 	rootCmd.Flags().StringVarP(&sOpt.BinMatch, "bin-match", "", "", "regexp to match bin path in asset")
 	rootCmd.Flags().BoolVarP(&sOpt.Force, "force", "f", false, "enable force setup")
 	rootCmd.Flags().BoolVarP(&opt.Strict, "strict", "", false, "require strict match")
+	rootCmd.Flags().BoolVarP(&verbose, "verbose", "", false, "show verbose log")
 }
