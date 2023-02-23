@@ -39,9 +39,9 @@ $ gh extension install k1LoW/gh-setup
     steps:
       -
         name: Setup k1LoW/tbls
-        run: k1LoW/gh-setup@v1
+        uses: k1LoW/gh-setup@v1
         with:
-          github-token: ${secrets.GITHUB_TOKEN}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           repo: k1LoW/tbls
         # version: v1.60.0
         # os: linux
@@ -145,7 +145,7 @@ Download binary from [releases page](https://github.com/k1LoW/gh-setup/releases)
 **go install:**
 
 ```console
-$ go install github.com/k1LoW/gh-setup@latest
+$ go install github.com/k1LoW/gh-setup/cmd/gh-setup@latest
 ```
 
 **docker:**
