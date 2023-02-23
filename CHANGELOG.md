@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.1.3](https://github.com/k1LoW/gh-setup/compare/v1.1.2...v1.1.3) - 2023-02-23
+- Fix README by @k2tzumi in https://github.com/k1LoW/gh-setup/pull/60
+- Add `--verbose` option by @k1LoW in https://github.com/k1LoW/gh-setup/pull/62
+
 ## [v1.1.2](https://github.com/k1LoW/gh-setup/compare/v1.1.1...v1.1.2) - 2023-02-18
 - Fix go.sum by @k1LoW in https://github.com/k1LoW/gh-setup/pull/58
 
