@@ -145,7 +145,7 @@ Download binary from [releases page](https://github.com/k1LoW/gh-setup/releases)
 **go install:**
 
 ```console
-$ go install github.com/k1LoW/gh-setup@latest
+$ go install github.com/k1LoW/gh-setup/cmd/gh-setup@latest
 ```
 
 **docker:**
