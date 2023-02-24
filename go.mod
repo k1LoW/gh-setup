@@ -3,14 +3,14 @@ module github.com/k1LoW/gh-setup
 go 1.20
 
 require (
-	github.com/cli/go-gh v1.1.0
+	github.com/cli/go-gh v1.2.0
 	github.com/google/go-cmp v0.5.9
-	github.com/google/go-github/v50 v50.0.0
+	github.com/google/go-github/v50 v50.1.0
 	github.com/h2non/filetype v1.1.3
 	github.com/k1LoW/go-github-client/v50 v50.0.6
 	github.com/nlepage/go-tarfs v1.1.0
 	github.com/spf13/cobra v1.6.1
-	golang.org/x/exp v0.0.0-20230213192124-5e25df0256eb
+	golang.org/x/exp v0.0.0-20230223210539-50820d90acfd
 )
 
 require (
@@ -25,7 +25,7 @@ require (
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/mattn/go-runewidth v0.0.14 // indirect
 	github.com/muesli/termenv v0.14.0 // indirect
-	github.com/rivo/uniseg v0.4.3 // indirect
+	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/thlib/go-timezone-local v0.0.0-20210907160436-ef149e42d28e // indirect
 	golang.org/x/crypto v0.6.0 // indirect
