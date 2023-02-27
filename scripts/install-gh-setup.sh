@@ -32,6 +32,18 @@ elif uname -a | grep Linux > /dev/null; then
     exe="gh-setup_${tag}_linux_amd64"
   fi
   bin="/tmp/gh-setup"
+
+  # If on a container or a self-hosted runner, install curl
+  if !(type "curl" > /dev/null 2>&1); then
+    if (type "apt-get" > /dev/null 2>&1); then
+      apt-get update || true
+      apt-get -y install curl || true
+    elif (type "yum" > /dev/null 2>&1); then
+      yum install -y curl || true
+    elif (type "apk" > /dev/null 2>&1); then
+      apk add --no-cache curl || true
+    fi
+  fi
 fi
 
 # download
