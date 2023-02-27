@@ -1,5 +1,8 @@
 # Changelog
 
+## [v1.2.1](https://github.com/k1LoW/gh-setup/compare/v1.2.0...v1.2.1) - 2023-02-27
+- If curl command is not available, try to install by @k1LoW in https://github.com/k1LoW/gh-setup/pull/67
+
 ## [v1.2.0](https://github.com/k1LoW/gh-setup/compare/v1.1.4...v1.2.0) - 2023-02-27
 - Run gh-setup on container by @k1LoW in https://github.com/k1LoW/gh-setup/pull/65
 
