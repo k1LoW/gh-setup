@@ -68,3 +68,26 @@ jobs:
       - name: Run setup as a action (2/2)
         run: tbls version
         shell: bash
+
+  job-on-container-test:
+    name: Test on container
+    runs-on: ubuntu-latest
+    container:
+      image: debian:latest
+    env:
+      DEBUG: true
+    steps:
+      - name: Check out source code
+        uses: actions/checkout@v3
+
+      - name: Run setup as a action (1/2)
+        uses: ./
+        with:
+          repo: k1LoW/tbls
+          force: true
+          strict: true
+          gh-setup-version: v1.0.1
+
+      - name: Run setup as a action (2/2)
+        run: tbls version
+        shell: bash
