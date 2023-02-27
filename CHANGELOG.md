@@ -1,5 +1,8 @@
 # Changelog
 
+## [v1.2.0](https://github.com/k1LoW/gh-setup/compare/v1.1.4...v1.2.0) - 2023-02-27
+- Run gh-setup on container by @k1LoW in https://github.com/k1LoW/gh-setup/pull/65
+
 ## [v1.1.4](https://github.com/k1LoW/gh-setup/compare/v1.1.3...v1.1.4) - 2023-02-24
 - Update pkgs by @k1LoW in https://github.com/k1LoW/gh-setup/pull/63
 
