@@ -52,13 +52,13 @@ runs:
   steps:
     -
       id: install-gh-setup
-      run: cd '${{ github.action_path }}' && scripts/install-gh-setup.sh
+      run: ${GITHUB_ACTION_PATH}/scripts/install-gh-setup.sh
       shell: bash
       env:
         GH_SETUP_GITHUB_TOKEN: ${{ inputs.github-token }}
         GH_SETUP_GH_SETUP_VERSION: ${{ inputs.gh-setup-version }}
     -
-      run: cd '${{ github.action_path }}' && scripts/run-gh-setup.sh
+      run: ${GITHUB_ACTION_PATH}/scripts/run-gh-setup.sh
       shell: bash
       env:
         GH_SETUP_GITHUB_TOKEN: ${{ inputs.github-token }}
