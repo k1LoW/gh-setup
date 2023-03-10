@@ -1,5 +1,8 @@
 # Changelog
 
+## [v1.2.2](https://github.com/k1LoW/gh-setup/compare/v1.2.1...v1.2.2) - 2023-03-10
+- Update pkgs by @k1LoW in https://github.com/k1LoW/gh-setup/pull/70
+
 ## [v1.2.1](https://github.com/k1LoW/gh-setup/compare/v1.2.0...v1.2.1) - 2023-02-27
 - If curl command is not available, try to install by @k1LoW in https://github.com/k1LoW/gh-setup/pull/67
 
