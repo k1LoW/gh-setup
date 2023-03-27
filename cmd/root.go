@@ -43,11 +43,12 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:       "gh-setup",
-	Short:     "Setup asset of Github Releases",
-	Long:      `Setup asset of Github Releases.`,
-	Args:      cobra.OnlyValidArgs,
-	ValidArgs: []string{"version"},
+	Use:          "gh-setup",
+	Short:        "Setup asset of Github Releases",
+	Long:         `Setup asset of Github Releases.`,
+	Args:         cobra.OnlyValidArgs,
+	ValidArgs:    []string{"version"},
+	SilenceUsage: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) > 0 {
 			cmd.Printf("gh-setup version %s\n", version.Version)
