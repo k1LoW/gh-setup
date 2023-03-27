@@ -20,14 +20,14 @@ strict=${GH_SETUP_STRICT}
 
 if [ -z "${force}" ]; then
   if [ -z "${strict}" ]; then
-    ${bin} --repo ${repo} --version=${version} --os=${os} --arch=${arch} --bin-dir=${bin_dir} --bin-match=${bin_match}
+    ${bin} --repo ${repo} --version=${version} --os=${os} --arch=${arch} --match=${match} --bin-dir=${bin_dir} --bin-match=${bin_match}
   else
-    ${bin} --repo ${repo} --version=${version} --os=${os} --arch=${arch} --bin-dir=${bin_dir} --bin-match=${bin_match}
+    ${bin} --repo ${repo} --version=${version} --os=${os} --arch=${arch} --match=${match} --bin-dir=${bin_dir} --bin-match=${bin_match} --strict
   fi
 else
   if [ -z "${strict}" ]; then
-    ${bin} --repo ${repo} --version=${version} --os=${os} --arch=${arch} --bin-dir=${bin_dir} --bin-match=${bin_match} --force
+    ${bin} --repo ${repo} --version=${version} --os=${os} --arch=${arch} --match=${match} --bin-dir=${bin_dir} --bin-match=${bin_match} --force
   else
-    ${bin} --repo ${repo} --version=${version} --os=${os} --arch=${arch} --bin-dir=${bin_dir} --bin-match=${bin_match} --force --strict
+    ${bin} --repo ${repo} --version=${version} --os=${os} --arch=${arch} --match=${match} --bin-dir=${bin_dir} --bin-match=${bin_match} --force --strict
   fi
 fi
