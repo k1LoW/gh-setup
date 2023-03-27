@@ -129,10 +129,6 @@ func detectAsset(assets []*releaseAsset, opt *AssetOption) (*releaseAsset, error
 	}
 	assetScores := []*assetScore{}
 	for _, a := range assets {
-		if om != nil && om.MatchString(a.Name) {
-			slog.Info("Select unconditionally because it matched --match", slog.String("name", a.Name), slog.String("match", om.String()))
-			return a, nil
-		}
 		if a.ContentType != "" && !contains(supportContentType, a.ContentType) {
 			slog.Info("Skip", slog.String("Reason", "Unsupported content type"), slog.String("content type", a.ContentType), slog.String("support content type", fmt.Sprintf("%v", supportContentType)))
 			continue
@@ -140,6 +136,10 @@ func detectAsset(assets []*releaseAsset, opt *AssetOption) (*releaseAsset, error
 		as := &assetScore{
 			asset: a,
 			score: 0,
+		}
+		if om != nil && om.MatchString(a.Name) {
+			slog.Info("it matched --match", slog.String("name", a.Name), slog.String("match", om.String()))
+			as.score += 13
 		}
 		assetScores = append(assetScores, as)
 		// os
