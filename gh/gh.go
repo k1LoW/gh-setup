@@ -3,6 +3,7 @@ package gh
 import (
 	"archive/zip"
 	"bytes"
+	"compress/bzip2"
 	"compress/gzip"
 	"context"
 	"errors"
@@ -40,6 +41,9 @@ var supportContentType = []string{
 	"application/x-zip-compressed",
 	// tar.gz
 	"application/gzip",
+	"application/x-gzip",
+	// tar.bz2
+	"application/x-bzip2",
 	// binary
 	"application/octet-stream",
 }
@@ -210,19 +214,38 @@ func makeFS(ctx context.Context, b []byte, repo, name string, contentTypes []str
 				return nil, err
 			}
 			return fsys, nil
-		} else {
-			b, err := io.ReadAll(gr)
+		}
+		b, err := io.ReadAll(gr)
+		if err != nil {
+			return nil, err
+		}
+		fsys := fstest.MapFS{}
+		fsys[repo] = &fstest.MapFile{
+			Data:    b,
+			Mode:    fs.ModePerm,
+			ModTime: time.Now(),
+		}
+		return fsys, nil
+	case matchContentTypes([]string{"application/x-bzip2"}, contentTypes):
+		br := bzip2.NewReader(bytes.NewReader(b))
+		if strings.HasSuffix(name, ".tar.bz2") {
+			fsys, err := tarfs.New(br)
 			if err != nil {
 				return nil, err
 			}
-			fsys := fstest.MapFS{}
-			fsys[repo] = &fstest.MapFile{
-				Data:    b,
-				Mode:    fs.ModePerm,
-				ModTime: time.Now(),
-			}
 			return fsys, nil
 		}
+		b, err := io.ReadAll(br)
+		if err != nil {
+			return nil, err
+		}
+		fsys := fstest.MapFS{}
+		fsys[repo] = &fstest.MapFile{
+			Data:    b,
+			Mode:    fs.ModePerm,
+			ModTime: time.Now(),
+		}
+		return fsys, nil
 	case matchContentTypes([]string{"application/octet-stream"}, contentTypes):
 		fsys := fstest.MapFS{}
 		fsys[repo] = &fstest.MapFile{
