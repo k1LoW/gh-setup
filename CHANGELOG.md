@@ -1,5 +1,8 @@
 # Changelog
 
+## [v1.4.0](https://github.com/k1LoW/gh-setup/compare/v1.3.0...v1.4.0) - 2023-04-21
+- Support bzip2 by @k1LoW in https://github.com/k1LoW/gh-setup/pull/75
+
 ## [v1.3.0](https://github.com/k1LoW/gh-setup/compare/v1.2.2...v1.3.0) - 2023-03-27
 - Fix option handling ( `--match` / `--strict` ) by @k1LoW in https://github.com/k1LoW/gh-setup/pull/72
 - Fix `--match` score by @k1LoW in https://github.com/k1LoW/gh-setup/pull/73
