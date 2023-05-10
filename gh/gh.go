@@ -41,6 +41,7 @@ var supportContentType = []string{
 	"application/x-zip-compressed",
 	// tar.gz
 	"application/gzip",
+	"application/x-gtar",
 	"application/x-gzip",
 	// tar.bz2
 	"application/x-bzip2",
