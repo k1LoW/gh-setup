@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.4.1](https://github.com/k1LoW/gh-setup/compare/v1.4.0...v1.4.1) - 2023-05-10
+- Support application/x-gtar by @k1LoW in https://github.com/k1LoW/gh-setup/pull/77
+- Support env `ACTIONS_STEP_DEBUG` by @k1LoW in https://github.com/k1LoW/gh-setup/pull/79
+
 ## [v1.4.0](https://github.com/k1LoW/gh-setup/compare/v1.3.0...v1.4.0) - 2023-04-21
 - Support bzip2 by @k1LoW in https://github.com/k1LoW/gh-setup/pull/75
 
