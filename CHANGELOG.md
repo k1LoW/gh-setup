@@ -1,5 +1,8 @@
 # Changelog
 
+## [v1.4.2](https://github.com/k1LoW/gh-setup/compare/v1.4.1...v1.4.2) - 2023-05-10
+- Check response status by @k1LoW in https://github.com/k1LoW/gh-setup/pull/80
+
 ## [v1.4.1](https://github.com/k1LoW/gh-setup/compare/v1.4.0...v1.4.1) - 2023-05-10
 - Support application/x-gtar by @k1LoW in https://github.com/k1LoW/gh-setup/pull/77
 - Support env `ACTIONS_STEP_DEBUG` by @k1LoW in https://github.com/k1LoW/gh-setup/pull/79
