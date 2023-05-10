@@ -38,6 +38,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       DEBUG: true
     steps:
       - name: Check out source code
@@ -83,6 +84,7 @@ jobs:
     container:
       image: debian:latest
     env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       DEBUG: true
     steps:
       - name: Check out source code
