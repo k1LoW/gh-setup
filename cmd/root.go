@@ -95,7 +95,7 @@ func Execute() {
 func setLogger(verbose bool) {
 	logger := slog.New(slog.NewTextHandler(io.Discard))
 	switch {
-	case os.Getenv("DEBUG") != "":
+	case os.Getenv("DEBUG") != "" || os.Getenv("ACTIONS_STEP_DEBUG") != "":
 		logger = slog.New(slog.HandlerOptions{
 			AddSource: true,
 			Level:     slog.LevelDebug,
