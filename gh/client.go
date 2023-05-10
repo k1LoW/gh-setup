@@ -260,6 +260,9 @@ func (c *client) downloadAssetWithoutAPI(ctx context.Context, a *releaseAsset) (
 	if err != nil {
 		return nil, err
 	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("failed to download: %d %s", resp.StatusCode, string(b))
+	}
 	return b, nil
 }
 
@@ -279,6 +282,9 @@ func (c *client) downloadAssetWithAPI(ctx context.Context, a *releaseAsset) ([]b
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("failed to download: %d %s", resp.StatusCode, string(b))
 	}
 	return b, nil
 }
