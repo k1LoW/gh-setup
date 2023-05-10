@@ -40,6 +40,7 @@ var supportContentType = []string{
 	"application/x-zip-compressed",
 	// tar.gz
 	"application/gzip",
+	"application/x-gtar",
 	// binary
 	"application/octet-stream",
 }
