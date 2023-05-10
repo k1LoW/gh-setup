@@ -88,7 +88,7 @@ jobs:
       - name: Check out source code
         uses: actions/checkout@v3
 
-      - name: Set up gh-seup
+      - name: Set up gh-setup
         uses: k1LoW/gh-setup@v1
         with:
           repo: cli/cli
@@ -101,7 +101,6 @@ jobs:
           echo -n 'version=' > $GITHUB_OUTPUT
           gh release list --limit 1 | cut -f 1 >> $GITHUB_OUTPUT
           cat $GITHUB_OUTPUT
-        shell: bash
 
       - name: Run setup as a action (1/2)
         uses: ./
