@@ -11,10 +11,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cli/go-gh"
-	"github.com/cli/go-gh/pkg/api"
-	"github.com/google/go-github/v50/github"
-	"github.com/k1LoW/go-github-client/v50/factory"
+	"github.com/cli/go-gh/v2/pkg/api"
+	"github.com/google/go-github/v52/github"
+	"github.com/k1LoW/go-github-client/v52/factory"
 	"golang.org/x/exp/slog"
 )
 
@@ -54,7 +53,7 @@ func newClient(ctx context.Context, owner, repo string) (*client, error) {
 		slog.Info("Authentication failed, access without credentials", slog.String("endpoint", v3ep), slog.String("owner", owner), slog.String("repo", repo))
 		return newNoAuthClient(ctx, owner, repo, v3ep)
 	}
-	hc, err := gh.HTTPClient(&api.ClientOptions{})
+	hc, err := api.DefaultHTTPClient()
 	if err != nil {
 		return nil, err
 	}
