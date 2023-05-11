@@ -93,18 +93,18 @@ func Execute() {
 }
 
 func setLogger(verbose bool) {
-	logger := slog.New(slog.NewTextHandler(io.Discard))
+	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
 	switch {
 	case os.Getenv("DEBUG") != "" || os.Getenv("ACTIONS_STEP_DEBUG") != "":
-		logger = slog.New(slog.HandlerOptions{
+		logger = slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
 			AddSource: true,
 			Level:     slog.LevelDebug,
-		}.NewTextHandler(os.Stderr))
+		}))
 	case verbose:
-		logger = slog.New(slog.HandlerOptions{
+		logger = slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
 			AddSource: false,
 			Level:     slog.LevelInfo,
-		}.NewTextHandler(os.Stderr))
+		}))
 	}
 	slog.SetDefault(logger)
 }
