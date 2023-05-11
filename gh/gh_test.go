@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/k1LoW/go-github-client/v50/factory"
+	"github.com/k1LoW/go-github-client/v52/factory"
 )
 
 func TestMain(m *testing.M) {

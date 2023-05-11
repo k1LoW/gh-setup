@@ -18,8 +18,7 @@ import (
 	"testing/fstest"
 	"time"
 
-	"github.com/cli/go-gh"
-	"github.com/cli/go-gh/pkg/repository"
+	"github.com/cli/go-gh/v2/pkg/repository"
 	"github.com/nlepage/go-tarfs"
 	"golang.org/x/exp/slog"
 )
@@ -86,21 +85,21 @@ func GetReleaseAsset(ctx context.Context, owner, repo string, opt *AssetOption) 
 func DetectHostOwnerRepo(ownerrepo string) (string, string, string, error) {
 	var host, owner, repo string
 	if ownerrepo == "" {
-		r, err := gh.CurrentRepository()
+		r, err := repository.Current()
 		if err != nil {
 			return "", "", "", err
 		}
-		host = r.Host()
-		owner = r.Owner()
-		repo = r.Name()
+		host = r.Host
+		owner = r.Owner
+		repo = r.Name
 	} else {
 		r, err := repository.Parse(ownerrepo)
 		if err != nil {
 			return "", "", "", err
 		}
-		host = r.Host()
-		owner = r.Owner()
-		repo = r.Name()
+		host = r.Host
+		owner = r.Owner
+		repo = r.Name
 	}
 	return host, owner, repo, nil
 }
