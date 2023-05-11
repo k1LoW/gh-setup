@@ -45,12 +45,12 @@ func newClient(ctx context.Context, owner, repo string) (*client, error) {
 		return newNoAuthClient(ctx, owner, repo, v3ep)
 	}
 	slog.Info("Access with credentials", slog.String("endpoint", v3ep), slog.String("owner", owner), slog.String("repo", repo))
-	gc, err := factory.NewGithubClient(factory.SkipAuth(true))
+	gc, err := factory.NewGithubClient()
 	if err != nil {
 		return nil, err
 	}
 	if _, _, err := gc.Repositories.Get(ctx, owner, repo); err != nil {
-		slog.Info("Authentication failed, access without credentials", slog.String("endpoint", v3ep), slog.String("owner", owner), slog.String("repo", repo))
+		slog.Info("Authentication failed, access without credentials", slog.String("error", err.Error()), slog.String("endpoint", v3ep), slog.String("owner", owner), slog.String("repo", repo))
 		return newNoAuthClient(ctx, owner, repo, v3ep)
 	}
 	hc, err := api.DefaultHTTPClient()
