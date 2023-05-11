@@ -2,9 +2,12 @@
 set -e
 
 repo="github.com/k1LoW/gh-setup"
-tag="$(gh release list -R "$repo" --limit 1 | cut -f 1)"
 
 extensionPath="$(dirname "$0")"
+cd "${extensionPath}" > /dev/null
+tag="$(git tag | tail -1)"
+cd - > /dev/null
+
 arch="$(uname -m)"
 
 exe=""
@@ -36,6 +39,8 @@ if [ "${exe}" == "" ]; then
   cd "${extensionPath}" > /dev/null
   go build -o "${exe}" cmd/gh-setup/main.go
   cd - > /dev/null
+  mv "${exe}" "${extensionPath}/bin/${exe}"
+  chmod +x "${extensionPath}/bin/${exe}"
 else
   if [[ ! -x "${extensionPath}/bin/${exe}" ]]; then
     mkdir -p "${extensionPath}/bin"
