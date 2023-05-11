@@ -1,5 +1,8 @@
 # Changelog
 
+## [v1.5.1](https://github.com/k1LoW/gh-setup/compare/v1.5.0...v1.5.1) - 2023-05-11
+- Need to test with authenticated clients. by @k1LoW in https://github.com/k1LoW/gh-setup/pull/85
+
 ## [v1.5.0](https://github.com/k1LoW/gh-setup/compare/v1.4.2...v1.5.0) - 2023-05-11
 - Update pkgs by @k1LoW in https://github.com/k1LoW/gh-setup/pull/83
 - Show sources by @k1LoW in https://github.com/k1LoW/gh-setup/pull/84
