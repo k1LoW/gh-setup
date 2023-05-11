@@ -39,7 +39,7 @@ if [ "${exe}" == "" ]; then
 else
   if [[ ! -x "${extensionPath}/bin/${exe}" ]]; then
     mkdir -p "${extensionPath}/bin"
-    rm -f "${extensionPath}/bin/*"
+    rm -f ${extensionPath}/bin/gh-setup*
     gh release -R "${repo}" download "${tag}" -p "${exe}" --dir="${extensionPath}/bin"
     chmod +x "${extensionPath}/bin/${exe}"
   fi
