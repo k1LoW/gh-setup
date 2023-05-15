@@ -1,5 +1,10 @@
 # Changelog
 
+## [v1.6.0](https://github.com/k1LoW/gh-setup/compare/v1.5.1...v1.6.0) - 2023-05-15
+- Freeze host of repo by @k1LoW in https://github.com/k1LoW/gh-setup/pull/87
+- Use `git tag` instead of `gh` by @k1LoW in https://github.com/k1LoW/gh-setup/pull/89
+- Bump github.com/cloudflare/circl from 1.1.0 to 1.3.3 by @dependabot in https://github.com/k1LoW/gh-setup/pull/90
+
 ## [v1.5.1](https://github.com/k1LoW/gh-setup/compare/v1.5.0...v1.5.1) - 2023-05-11
 - Need to test with authenticated clients. by @k1LoW in https://github.com/k1LoW/gh-setup/pull/85
 
