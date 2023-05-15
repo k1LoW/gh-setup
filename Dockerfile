@@ -16,7 +16,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder /workdir/ghsetup ./usr/bin
+COPY --from=builder /workdir/ghsetup ./usr/bin/gh-setup
 
 ENTRYPOINT ["/entrypoint.sh"]
 
