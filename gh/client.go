@@ -13,8 +13,8 @@ import (
 
 	"github.com/cli/go-gh/v2/pkg/api"
 	"github.com/cli/go-gh/v2/pkg/auth"
-	"github.com/google/go-github/v52/github"
-	"github.com/k1LoW/go-github-client/v52/factory"
+	"github.com/google/go-github/v53/github"
+	"github.com/k1LoW/go-github-client/v53/factory"
 	"golang.org/x/exp/slog"
 )
 
