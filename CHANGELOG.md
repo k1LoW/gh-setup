@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.8.0](https://github.com/k1LoW/gh-setup/compare/v1.7.0...v1.8.0) - 2023-07-28
+- Add `--skip-content-type-check` option for skipping check of content type of assets. by @k1LoW in https://github.com/k1LoW/gh-setup/pull/96
+- Support skip-content-type-check for Action by @k1LoW in https://github.com/k1LoW/gh-setup/pull/97
+
 ## [v1.7.0](https://github.com/k1LoW/gh-setup/compare/v1.6.0...v1.7.0) - 2023-07-11
 - Fix extension setup script by @k1LoW in https://github.com/k1LoW/gh-setup/pull/91
 - Support linux arm64 by @k1LoW in https://github.com/k1LoW/gh-setup/pull/93
