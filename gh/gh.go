@@ -51,11 +51,12 @@ var supportContentType = []string{
 const versionLatest = "latest"
 
 type AssetOption struct {
-	Match   string
-	Version string
-	OS      string
-	Arch    string
-	Strict  bool
+	Match                string
+	Version              string
+	OS                   string
+	Arch                 string
+	Strict               bool
+	SkipContentTypeCheck bool
 }
 
 func GetReleaseAsset(ctx context.Context, owner, repo string, opt *AssetOption) (*releaseAsset, fs.FS, error) {
@@ -133,7 +134,7 @@ func detectAsset(assets []*releaseAsset, opt *AssetOption) (*releaseAsset, error
 	}
 	assetScores := []*assetScore{}
 	for _, a := range assets {
-		if a.ContentType != "" && !contains(supportContentType, a.ContentType) {
+		if (opt == nil || !opt.SkipContentTypeCheck) && a.ContentType != "" && !contains(supportContentType, a.ContentType) {
 			slog.Info("Skip",
 				slog.String("name", a.Name),
 				slog.String("reason", "Unsupported content type"),
