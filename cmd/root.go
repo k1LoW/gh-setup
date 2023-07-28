@@ -119,5 +119,6 @@ func init() {
 	rootCmd.Flags().StringVarP(&sOpt.BinMatch, "bin-match", "", "", "regexp to match bin path in asset")
 	rootCmd.Flags().BoolVarP(&sOpt.Force, "force", "f", false, "enable force setup")
 	rootCmd.Flags().BoolVarP(&opt.Strict, "strict", "", false, "require strict match")
+	rootCmd.Flags().BoolVarP(&opt.SkipContentTypeCheck, "skip-content-type-check", "", false, "skip check content-type of assets")
 	rootCmd.Flags().BoolVarP(&verbose, "verbose", "", false, "show verbose log")
 }
