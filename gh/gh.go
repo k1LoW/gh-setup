@@ -134,7 +134,7 @@ func detectAsset(assets []*releaseAsset, opt *AssetOption) (*releaseAsset, error
 	}
 	assetScores := []*assetScore{}
 	for _, a := range assets {
-		if !opt.SkipContentTypeCheck && a.ContentType != "" && !contains(supportContentType, a.ContentType) {
+		if (opt == nil || !opt.SkipContentTypeCheck) && a.ContentType != "" && !contains(supportContentType, a.ContentType) {
 			slog.Info("Skip",
 				slog.String("name", a.Name),
 				slog.String("reason", "Unsupported content type"),
