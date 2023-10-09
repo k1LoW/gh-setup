@@ -138,6 +138,12 @@ $ apk add gh-setup.apk
 $ brew install k1LoW/tap/gh-setup
 ```
 
+**[aqua](https://aquaproj.github.io/):**
+
+```console
+$ aqua g -i k1LoW/gh-setup
+```
+
 **manually:**
 
 Download binary from [releases page](https://github.com/k1LoW/gh-setup/releases)
