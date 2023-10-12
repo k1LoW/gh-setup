@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.8.1](https://github.com/k1LoW/gh-setup/compare/v1.8.0...v1.8.1) - 2023-10-11
+- docs: add the installation guide with aqua by @suzuki-shunsuke in https://github.com/k1LoW/gh-setup/pull/99
+- Bump golang.org/x/net from 0.10.0 to 0.17.0 by @dependabot in https://github.com/k1LoW/gh-setup/pull/101
+
 ## [v1.8.0](https://github.com/k1LoW/gh-setup/compare/v1.7.0...v1.8.0) - 2023-07-28
 - Add `--skip-content-type-check` option for skipping check of content type of assets. by @k1LoW in https://github.com/k1LoW/gh-setup/pull/96
 - Support skip-content-type-check for Action by @k1LoW in https://github.com/k1LoW/gh-setup/pull/97
