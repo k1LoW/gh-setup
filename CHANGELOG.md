@@ -1,5 +1,10 @@
 # Changelog
 
+## [v1.8.2](https://github.com/k1LoW/gh-setup/compare/v1.8.1...v1.8.2) - 2024-01-26
+- Bump golang.org/x/crypto from 0.14.0 to 0.17.0 by @dependabot in https://github.com/k1LoW/gh-setup/pull/102
+- Bump github.com/cloudflare/circl from 1.3.3 to 1.3.7 by @dependabot in https://github.com/k1LoW/gh-setup/pull/104
+- Fix CD pipeline by @k1LoW in https://github.com/k1LoW/gh-setup/pull/105
+
 ## [v1.8.1](https://github.com/k1LoW/gh-setup/compare/v1.8.0...v1.8.1) - 2023-10-11
 - docs: add the installation guide with aqua by @suzuki-shunsuke in https://github.com/k1LoW/gh-setup/pull/99
 - Bump golang.org/x/net from 0.10.0 to 0.17.0 by @dependabot in https://github.com/k1LoW/gh-setup/pull/101
