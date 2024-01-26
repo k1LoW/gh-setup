@@ -62,7 +62,7 @@ jobs:
         id: latest_version
         run: |
           echo -n 'version=' > $GITHUB_OUTPUT
-          gh release list --limit 1 | cut -f 1 >> $GITHUB_OUTPUT
+          gh release list --exclude-drafts --exclude-pre-releases --limit 1 | cut -f 1 >> $GITHUB_OUTPUT
           cat $GITHUB_OUTPUT
         shell: bash
 
