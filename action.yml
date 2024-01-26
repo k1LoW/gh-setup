@@ -49,7 +49,7 @@ inputs:
     required: false
   gh-setup-version:
     description: "Version of gh-setup"
-    default: "v1.8.1"
+    default: "v1.8.2"
     required: false
 runs:
   using: "composite"
