@@ -29,7 +29,9 @@ elif uname -a | grep Darwin > /dev/null; then
   bin="${TMPDIR}gh-setup"
 elif uname -a | grep Linux > /dev/null; then
   if [ $arch = "x86_64" ]; then
-    exe="gh-setup_${tag}_linux_amd64"
+      exe="gh-setup_${tag}_linux_amd64"
+  elif [ $arch = "arm64" ] || [ $arch = "aarch64" ]; then
+      exe="gh-setup_${tag}_linux_arm64"
   fi
   bin="/tmp/gh-setup"
 
