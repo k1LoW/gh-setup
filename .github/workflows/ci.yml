@@ -80,21 +80,13 @@ jobs:
 
   job-on-container-test:
     name: Test on container
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest-xlarge] # amd64 and arm64
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     container:
       image: debian:latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       DEBUG: true
     steps:
-      - name: Show arch
-        run: |
-          uname -a
-          uname -m
-
       - name: Check out source code
         uses: actions/checkout@v3
 
