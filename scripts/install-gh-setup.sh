@@ -30,7 +30,7 @@ elif uname -a | grep Darwin > /dev/null; then
 elif uname -a | grep Linux > /dev/null; then
   if [ $arch = "x86_64" ]; then
       exe="gh-setup_${tag}_linux_amd64"
-  elif [ $arch = "aarch64" -o $arch = "arm64" ]; then
+  elif [ $arch = "arm64" ] || [ $arch = "aarch64" ]; then
       exe="gh-setup_${tag}_linux_arm64"
   fi
   bin="/tmp/gh-setup"
