@@ -1,5 +1,8 @@
 # Changelog
 
+## [v1.8.4](https://github.com/k1LoW/gh-setup/compare/v1.8.3...v1.8.4) - 2024-03-13
+- Bump google.golang.org/protobuf from 1.28.1 to 1.33.0 by @dependabot in https://github.com/k1LoW/gh-setup/pull/109
+
 ## [v1.8.3](https://github.com/k1LoW/gh-setup/compare/v1.8.2...v1.8.3) - 2024-02-26
 - Support linux arm by @k1LoW in https://github.com/k1LoW/gh-setup/pull/108
 
