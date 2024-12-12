@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.9.0](https://github.com/k1LoW/gh-setup/compare/v1.8.4...v1.9.0) - 2024-12-12
+- Bump github.com/golang-jwt/jwt/v4 from 4.5.0 to 4.5.1 by @dependabot in https://github.com/k1LoW/gh-setup/pull/112
+- Bump golang.org/x/crypto from 0.21.0 to 0.31.0 by @dependabot in https://github.com/k1LoW/gh-setup/pull/115
+- Update pkgs by @k1LoW in https://github.com/k1LoW/gh-setup/pull/116
+- Fix CI by @k1LoW in https://github.com/k1LoW/gh-setup/pull/117
+
 ## [v1.8.4](https://github.com/k1LoW/gh-setup/compare/v1.8.3...v1.8.4) - 2024-04-19
 - Bump google.golang.org/protobuf from 1.28.1 to 1.33.0 by @dependabot in https://github.com/k1LoW/gh-setup/pull/109
 - Bump golang.org/x/net from 0.17.0 to 0.23.0 by @dependabot in https://github.com/k1LoW/gh-setup/pull/111
