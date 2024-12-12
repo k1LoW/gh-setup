@@ -14,16 +14,21 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Check out source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
           cache: true
 
       - name: Run lint
         uses: reviewdog/action-golangci-lint@v2
+        with:
+          fail_on_error: true
+          go_version_file: go.mod
+          golangci_lint_flags: --timeout=5m
+          cache: false
 
       - name: Run tests
         run: make ci
@@ -42,10 +47,10 @@ jobs:
       DEBUG: true
     steps:
       - name: Check out source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
           cache: true
@@ -88,7 +93,7 @@ jobs:
       DEBUG: true
     steps:
       - name: Check out source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up gh-setup
         uses: k1LoW/gh-setup@v1
