@@ -3,13 +3,13 @@ module github.com/k1LoW/gh-setup
 go 1.23.6
 
 require (
-	github.com/cli/go-gh/v2 v2.11.1
+	github.com/cli/go-gh/v2 v2.11.2
 	github.com/google/go-cmp v0.6.0
 	github.com/google/go-github/v67 v67.0.0
 	github.com/h2non/filetype v1.1.3
 	github.com/k1LoW/go-github-client/v67 v67.0.13
-	github.com/nlepage/go-tarfs v1.1.0
-	github.com/spf13/cobra v1.7.0
+	github.com/nlepage/go-tarfs v1.2.1
+	github.com/spf13/cobra v1.8.1
 	golang.org/x/exp v0.0.0-20230626212559-97b1e661b5df
 )
 
