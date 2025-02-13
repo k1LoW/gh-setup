@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.9.1](https://github.com/k1LoW/gh-setup/compare/v1.9.0...v1.9.1) - 2025-02-13
+- chore(deps): bump the dependencies group with 3 updates by @dependabot in https://github.com/k1LoW/gh-setup/pull/119
+- chore(deps): bump the dependencies group with 6 updates by @dependabot in https://github.com/k1LoW/gh-setup/pull/120
+
 ## [v1.9.0](https://github.com/k1LoW/gh-setup/compare/v1.8.4...v1.9.0) - 2024-12-12
 - Bump github.com/golang-jwt/jwt/v4 from 4.5.0 to 4.5.1 by @dependabot in https://github.com/k1LoW/gh-setup/pull/112
 - Bump golang.org/x/crypto from 0.21.0 to 0.31.0 by @dependabot in https://github.com/k1LoW/gh-setup/pull/115
