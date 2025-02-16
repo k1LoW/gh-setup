@@ -9,7 +9,7 @@ require (
 	github.com/h2non/filetype v1.1.3
 	github.com/k1LoW/go-github-client/v67 v67.0.13
 	github.com/nlepage/go-tarfs v1.2.1
-	github.com/spf13/cobra v1.8.1
+	github.com/spf13/cobra v1.9.0
 	golang.org/x/exp v0.0.0-20230626212559-97b1e661b5df
 )
 
@@ -29,7 +29,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/muesli/termenv v0.15.2 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/thlib/go-timezone-local v0.0.0-20210907160436-ef149e42d28e // indirect
 	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/term v0.27.0 // indirect
