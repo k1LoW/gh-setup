@@ -1,8 +1,8 @@
 package setup
 
 import (
-	"crypto/md5"
-	"crypto/sha1"
+	"crypto/md5"  //nolint:gosec
+	"crypto/sha1" //nolint:gosec
 	"crypto/sha256"
 	"crypto/sha512"
 	"encoding/hex"
@@ -145,7 +145,7 @@ func binDir() (string, error) {
 	}
 	for _, p := range paths {
 		f := filepath.Join(p, "gh-setup-tmp")
-		if err := os.WriteFile(f, []byte("test"), os.ModePerm); err == nil {
+		if err := os.WriteFile(f, []byte("test"), os.ModePerm); err == nil { //nolint:gosec
 			if err := os.Remove(f); err != nil {
 				return "", err
 			}
@@ -256,10 +256,10 @@ func checksum(b []byte, c string) error {
 	case "crc32":
 		got = fmt.Sprintf("%08x", crc32.ChecksumIEEE(b))
 	case "md5":
-		sum := md5.Sum(b)
+		sum := md5.Sum(b) //nolint:gosec
 		got = hex.EncodeToString(sum[:])
 	case "sha1":
-		sum := sha1.Sum(b)
+		sum := sha1.Sum(b) //nolint:gosec
 		got = hex.EncodeToString(sum[:])
 	case "sha256":
 		sum := sha256.Sum256(b)
