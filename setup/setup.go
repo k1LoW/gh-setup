@@ -1,14 +1,8 @@
 package setup
 
 import (
-	"crypto/md5"  //nolint:gosec
-	"crypto/sha1" //nolint:gosec
-	"crypto/sha256"
-	"crypto/sha512"
-	"encoding/hex"
 	"errors"
 	"fmt"
-	"hash/crc32"
 	"io/fs"
 	"net/http"
 	"os"
@@ -25,7 +19,6 @@ import (
 type Option struct {
 	BinDir   string
 	BinMatch string
-	Checksum string
 	Force    bool
 }
 
@@ -77,10 +70,6 @@ func Bin(fsys fs.FS, opt *Option) (map[string]string, error) {
 
 		b, err := fs.ReadFile(fsys, path)
 		if err != nil {
-			return err
-		}
-
-		if err := checksum(b, opt.Checksum); err != nil {
 			return err
 		}
 
@@ -216,63 +205,4 @@ func isBinary(b []byte) bool {
 	}
 	slog.Info("Detect file type", slog.String("file type", fmt.Sprintf("%v", typ)))
 	return typ == filetype.Unknown
-}
-
-func checksum(b []byte, c string) error {
-	if c == "" {
-		return nil // No checksum verification needed
-	}
-
-	var (
-		alg  string
-		want string
-	)
-
-	// Check if the format is "algorithm:hash"
-	parts := strings.SplitN(c, ":", 2)
-	if len(parts) == 2 {
-		alg = strings.ToLower(parts[0])
-		want = strings.ToLower(parts[1])
-	} else {
-		// If no alg is specified, try to determine it based on the length of the checksum
-		want = strings.ToLower(c)
-		// Try to match based on length and value
-		switch len(want) {
-		case 8: // CRC32
-			alg = "crc32"
-		case 32: // MD5
-			alg = "md5"
-		case 40: // SHA-1
-			alg = "sha1"
-		case 64: // SHA-256
-			alg = "sha256"
-		case 128: // SHA-512
-			alg = "sha512"
-		}
-	}
-
-	var got string
-	switch alg {
-	case "crc32":
-		got = fmt.Sprintf("%08x", crc32.ChecksumIEEE(b))
-	case "md5":
-		sum := md5.Sum(b) //nolint:gosec
-		got = hex.EncodeToString(sum[:])
-	case "sha1":
-		sum := sha1.Sum(b) //nolint:gosec
-		got = hex.EncodeToString(sum[:])
-	case "sha256":
-		sum := sha256.Sum256(b)
-		got = hex.EncodeToString(sum[:])
-	case "sha512":
-		sum := sha512.Sum512(b)
-		got = hex.EncodeToString(sum[:])
-	default:
-		return fmt.Errorf("unsupported alg: %s", alg)
-	}
-
-	if got != want {
-		return fmt.Errorf("checksum mismatch: expected=%s, calculated=%s", want, got)
-	}
-	return nil
 }
