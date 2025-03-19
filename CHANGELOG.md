@@ -1,5 +1,8 @@
 # Changelog
 
+## [v1.10.0](https://github.com/k1LoW/gh-setup/compare/v1.9.4...v1.10.0) - 2025-03-19
+- ci: update CI workflow to include checksum verification by @k1LoW in https://github.com/k1LoW/gh-setup/pull/130
+
 ## [v1.9.4](https://github.com/k1LoW/gh-setup/compare/v1.9.3...v1.9.4) - 2025-03-19
 - fix: correct checksum flag assignment and add checksum validation by @k1LoW in https://github.com/k1LoW/gh-setup/pull/128
 
