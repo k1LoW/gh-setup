@@ -34,4 +34,5 @@ if [ ! -z "${skip_content_type_check}" ]; then
     boolopts+=" --skip-content-type-check"
 fi
 
-${bin} --repo ${repo} --version=${version} --os=${os} --arch=${arch} --match=${match} --bin-dir=${bin_dir} --bin-match=${bin_match} --checksum=${checksum}${boolopts}
+# ${bin} --repo ${repo} --version=${version} --os=${os} --arch=${arch} --match=${match} --bin-dir=${bin_dir} --bin-match=${bin_match} --checksum=${checksum}${boolopts}
+${bin} --repo ${repo} --version=${version} --os=${os} --arch=${arch} --match=${match} --bin-dir=${bin_dir} --bin-match=${bin_match}${boolopts}
