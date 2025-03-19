@@ -113,6 +113,10 @@ jobs:
         uses: ./
         with:
           repo: k1LoW/tbls
+          version: v1.84.0
+          os: linux
+          arch: amd64
+          checksum: 83f35a07fd2a00c2aa360a47edca6d261f5208186911977eff39097151fc57d5
           force: true
           strict: true
           gh-setup-version: ${{ steps.latest_version.outputs.version }}
