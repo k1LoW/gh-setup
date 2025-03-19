@@ -47,6 +47,7 @@ $ gh extension install k1LoW/gh-setup
         # os: linux
         # arch: amd64
         # bin-match: tbls
+        # checksum: f1ee97bbf22d5324ec2b468d83f43088d9e5c61deb77fafc220b297e03d47574
         # force: true
         # strict: true
         # gh-setup-version: latest
@@ -79,6 +80,10 @@ inputs:
     description: Enable force setup
     default: ''
     required: false
+  checksum:
+    description: Checksum of tbls
+    default: ''
+    required: false
 runs:
   using: 'composite'
   steps:
@@ -89,6 +94,7 @@ runs:
         github-token: ${{ inputs.github-token }}
         version: ${{ inputs.version }}
         bin-match: tbls
+        checksum: ${{ inputs.checksum }}
         force: ${{ inputs.force }}
 ```
 

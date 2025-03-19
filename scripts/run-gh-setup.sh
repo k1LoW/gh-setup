@@ -15,6 +15,7 @@ arch=${GH_SETUP_ARCH}
 match=${GH_SETUP_MATCH}
 bin_dir=${GH_SETUP_BIN_DIR}
 bin_match=${GH_SETUP_BIN_MATCH}
+checksum=${GH_SETUP_CHECKSUM}
 force=${GH_SETUP_FORCE}
 strict=${GH_SETUP_STRICT}
 skip_content_type_check=${GH_SETUP_SKIP_CONTENT_TYPE_CHECK}
@@ -33,4 +34,5 @@ if [ ! -z "${skip_content_type_check}" ]; then
     boolopts+=" --skip-content-type-check"
 fi
 
+# ${bin} --repo ${repo} --version=${version} --os=${os} --arch=${arch} --match=${match} --bin-dir=${bin_dir} --bin-match=${bin_match} --checksum=${checksum}${boolopts}
 ${bin} --repo ${repo} --version=${version} --os=${os} --arch=${arch} --match=${match} --bin-dir=${bin_dir} --bin-match=${bin_match}${boolopts}

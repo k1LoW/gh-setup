@@ -35,6 +35,10 @@ inputs:
     description: "Regexp to match bin path in asset"
     default: ""
     required: false
+  checksum:
+    description: "Checksum of asset"
+    default: ""
+    required: false
   force:
     description: "Enable force setup"
     default: ""
@@ -73,6 +77,7 @@ runs:
         GH_SETUP_MATCH: ${{ inputs.match }}
         GH_SETUP_BIN_DIR: ${{ inputs.bin-dir }}
         GH_SETUP_BIN_MATCH: ${{ inputs.bin-match }}
+        GH_SETUP_CHECKSUM: ${{ inputs.checksum }}
         GH_SETUP_FORCE: ${{ inputs.force }}
         GH_SETUP_STRICT: ${{ inputs.strict }}
         GH_SETUP_SKIP_CONTENT_TYPE_CHECK: ${{ inputs.skip-content-type-check }}

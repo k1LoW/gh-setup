@@ -76,9 +76,13 @@ func newNoAuthClient(ctx context.Context, owner, repo, v3ep string) (*client, er
 	if err != nil {
 		return nil, err
 	}
+	tp, ok := http.DefaultTransport.(*http.Transport)
+	if !ok {
+		return nil, errors.New("failed to get http.Transport")
+	}
 	hc := &http.Client{
 		Timeout:   30 * time.Second,
-		Transport: http.DefaultTransport.(*http.Transport).Clone(),
+		Transport: tp.Clone(),
 	}
 	c := &client{
 		owner: owner,
