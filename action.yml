@@ -53,7 +53,7 @@ inputs:
     required: false
   gh-setup-version:
     description: "Version of gh-setup"
-    default: "v1.9.2"
+    default: "v1.9.3"
     required: false
 runs:
   using: "composite"
