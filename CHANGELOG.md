@@ -1,5 +1,8 @@
 # Changelog
 
+## [v1.9.3](https://github.com/k1LoW/gh-setup/compare/v1.9.2...v1.9.3) - 2025-03-19
+- feat: add checksum verification for assets by @k1LoW in https://github.com/k1LoW/gh-setup/pull/125
+
 ## [v1.9.2](https://github.com/k1LoW/gh-setup/compare/v1.9.1...v1.9.2) - 2025-03-19
 - chore(deps): bump the dependencies group across 1 directory with 2 updates by @dependabot in https://github.com/k1LoW/gh-setup/pull/122
 - ci: pin dependencies by @k1LoW in https://github.com/k1LoW/gh-setup/pull/123
