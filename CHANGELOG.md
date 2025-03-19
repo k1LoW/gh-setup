@@ -1,5 +1,8 @@
 # Changelog
 
+## [v1.9.4](https://github.com/k1LoW/gh-setup/compare/v1.9.3...v1.9.4) - 2025-03-19
+- fix: correct checksum flag assignment and add checksum validation by @k1LoW in https://github.com/k1LoW/gh-setup/pull/128
+
 ## [v1.9.3](https://github.com/k1LoW/gh-setup/compare/v1.9.2...v1.9.3) - 2025-03-19
 - feat: add checksum verification for assets by @k1LoW in https://github.com/k1LoW/gh-setup/pull/125
 
