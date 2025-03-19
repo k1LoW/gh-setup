@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.9.2](https://github.com/k1LoW/gh-setup/compare/v1.9.1...v1.9.2) - 2025-03-19
+- chore(deps): bump the dependencies group across 1 directory with 2 updates by @dependabot in https://github.com/k1LoW/gh-setup/pull/122
+- ci: pin dependencies by @k1LoW in https://github.com/k1LoW/gh-setup/pull/123
+
 ## [v1.9.1](https://github.com/k1LoW/gh-setup/compare/v1.9.0...v1.9.1) - 2025-02-13
 - chore(deps): bump the dependencies group with 3 updates by @dependabot in https://github.com/k1LoW/gh-setup/pull/119
 - chore(deps): bump the dependencies group with 6 updates by @dependabot in https://github.com/k1LoW/gh-setup/pull/120
