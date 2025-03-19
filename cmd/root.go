@@ -117,6 +117,7 @@ func init() {
 	rootCmd.Flags().StringVarP(&opt.Match, "match", "", "", "regexp to match asset name")
 	rootCmd.Flags().StringVarP(&sOpt.BinDir, "bin-dir", "", "", "bin directory for setup")
 	rootCmd.Flags().StringVarP(&sOpt.BinMatch, "bin-match", "", "", "regexp to match bin path in asset")
+	rootCmd.Flags().StringVarP(&sOpt.Checksum, "checksum", "", "", "checksum of asset")
 	rootCmd.Flags().BoolVarP(&sOpt.Force, "force", "f", false, "enable force setup")
 	rootCmd.Flags().BoolVarP(&opt.Strict, "strict", "", false, "require strict match")
 	rootCmd.Flags().BoolVarP(&opt.SkipContentTypeCheck, "skip-content-type-check", "", false, "skip check content-type of assets")
