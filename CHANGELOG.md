@@ -1,5 +1,10 @@
 # Changelog
 
+## [v1.10.2](https://github.com/k1LoW/gh-setup/compare/v1.10.1...v1.10.2) - 2025-04-08
+- chore(deps): bump github.com/k1LoW/go-github-client/v67 from 67.0.13 to 67.0.16 in the dependencies group by @dependabot in https://github.com/k1LoW/gh-setup/pull/135
+- chore(deps): bump the dependencies group across 1 directory with 4 updates by @dependabot in https://github.com/k1LoW/gh-setup/pull/137
+- chore(deps): bump github.com/cli/go-gh/v2 from 2.11.2 to 2.12.0 in the dependencies group by @dependabot in https://github.com/k1LoW/gh-setup/pull/138
+
 ## [v1.10.1](https://github.com/k1LoW/gh-setup/compare/v1.10.0...v1.10.1) - 2025-03-22
 - chore(deps): bump github.com/golang-jwt/jwt/v4 from 4.5.1 to 4.5.2 by @dependabot in https://github.com/k1LoW/gh-setup/pull/132
 
