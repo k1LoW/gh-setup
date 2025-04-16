@@ -17,6 +17,8 @@ import (
 	"io"
 	"io/fs"
 	"net/http"
+	"os"
+	"os/exec"
 	"regexp"
 	"runtime"
 	"sort"
@@ -64,6 +66,8 @@ type AssetOption struct {
 	Strict               bool
 	SkipContentTypeCheck bool
 	Checksum             string
+	VerifyAttestation    bool   // Enable attestation verification
+	AttestationFlags     string // Additional flags for gh attestation verify
 }
 
 func GetReleaseAsset(ctx context.Context, owner, repo string, opt *AssetOption) (*releaseAsset, fs.FS, error) {
@@ -88,6 +92,26 @@ func GetReleaseAsset(ctx context.Context, owner, repo string, opt *AssetOption) 
 		if err := checksum(b, opt.Checksum); err != nil {
 			return nil, nil, err
 		}
+
+		// Add attestation verification
+		if opt.VerifyAttestation {
+			// Create a temporary file for the downloaded asset
+			tmpFile, err := os.CreateTemp("", fmt.Sprintf("%s-%s-*", repo, a.Name))
+			if err != nil {
+				return nil, nil, fmt.Errorf("failed to create temp file for attestation verification: %w", err)
+			}
+			defer os.Remove(tmpFile.Name())
+			defer tmpFile.Close()
+
+			if _, err := tmpFile.Write(b); err != nil {
+				return nil, nil, fmt.Errorf("failed to write to temp file: %w", err)
+			}
+
+			// Verify attestation
+			if err := verifyAttestation(ctx, tmpFile.Name(), opt.AttestationFlags); err != nil {
+				return nil, nil, err
+			}
+		}
 	}
 
 	fsys, err := makeFS(ctx, b, repo, a.Name, []string{a.ContentType, http.DetectContentType(b)})
@@ -95,6 +119,43 @@ func GetReleaseAsset(ctx context.Context, owner, repo string, opt *AssetOption) 
 		return nil, nil, err
 	}
 	return a, fsys, nil
+}
+
+// verifyAttestation verifies the attestation of an artifact using gh attestation verify
+func verifyAttestation(ctx context.Context, artifactPath string, additionalFlags string) error {
+	// Check if gh CLI is installed
+	if _, err := exec.LookPath("gh"); err != nil {
+		return fmt.Errorf("gh CLI not found: %w", err)
+	}
+
+	// Build the base command
+	baseCmd := fmt.Sprintf("gh attestation verify %s", artifactPath)
+
+	// Add any additional flags
+	fullCmd := baseCmd
+	if additionalFlags != "" {
+		fullCmd = fmt.Sprintf("%s %s", baseCmd, additionalFlags)
+	}
+
+	slog.Info("Running attestation verification", slog.String("command", fullCmd))
+
+	// Split the command into parts for exec.Command
+	cmdParts := strings.Fields(fullCmd)
+	cmd := exec.CommandContext(ctx, cmdParts[0], cmdParts[1:]...)
+
+	// Force TTY output for gh attestation verify command
+	cmd.Env = append(os.Environ(), "GH_FORCE_TTY=1")
+
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("attestation verification failed: %s: %s", err, string(output))
+	}
+
+	slog.Info("Attestation verification successful",
+		slog.String("artifact", artifactPath),
+		slog.String("output", string(output)))
+
+	return nil
 }
 
 func DetectHostOwnerRepo(ownerrepo string) (string, string, string, error) {

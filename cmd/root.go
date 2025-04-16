@@ -122,4 +122,6 @@ func init() {
 	rootCmd.Flags().BoolVarP(&opt.Strict, "strict", "", false, "require strict match")
 	rootCmd.Flags().BoolVarP(&opt.SkipContentTypeCheck, "skip-content-type-check", "", false, "skip check content-type of assets")
 	rootCmd.Flags().BoolVarP(&verbose, "verbose", "", false, "show verbose log")
+	rootCmd.Flags().BoolVarP(&opt.VerifyAttestation, "verify-attestation", "", false, "enable attestation verification using 'gh attestation verify'")
+	rootCmd.Flags().StringVarP(&opt.AttestationFlags, "attestation-flags", "", "", "additional flags to pass to 'gh attestation verify' (e.g. \"--owner=k1LoW\")")
 }

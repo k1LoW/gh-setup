@@ -50,6 +50,8 @@ $ gh extension install k1LoW/gh-setup
         # checksum: f1ee97bbf22d5324ec2b468d83f43088d9e5c61deb77fafc220b297e03d47574
         # force: true
         # strict: true
+        # verify-attestation: true
+        # attestation-flags: "--owner=k1LoW"
         # gh-setup-version: latest
       -
         name: Run tbls
@@ -165,3 +167,27 @@ $ go install github.com/k1LoW/gh-setup/cmd/gh-setup@latest
 ```console
 $ docker pull ghcr.io/k1low/gh-setup:latest
 ```
+
+## Attestation Verification
+
+gh-setup supports verifying attestations using the `gh attestation verify` command. To enable attestation verification, use the `--verify-attestation` flag. You can also pass additional flags to the `gh attestation verify` command using the `--attestation-flags` flag.
+
+Example:
+
+```console
+$ gh setup --repo k1LoW/tbls --verify-attestation --attestation-flags "--owner=k1LoW"
+```
+
+In GitHub Actions:
+
+```yaml
+- name: Setup k1LoW/tbls
+  uses: k1LoW/gh-setup@v1
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    repo: k1LoW/tbls
+    verify-attestation: true
+    attestation-flags: "--owner=k1LoW"
+```
+
+This feature requires the `gh` CLI with the attestation extension to be installed.
