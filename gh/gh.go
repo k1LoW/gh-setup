@@ -121,7 +121,7 @@ func GetReleaseAsset(ctx context.Context, owner, repo string, opt *AssetOption) 
 	return a, fsys, nil
 }
 
-// verifyAttestation verifies the attestation of an artifact using gh attestation verify
+// verifyAttestation verifies the attestation of an artifact using gh attestation verify.
 func verifyAttestation(ctx context.Context, artifactPath string, additionalFlags string) error {
 	// Check if gh CLI is installed
 	if _, err := exec.LookPath("gh"); err != nil {
@@ -141,7 +141,7 @@ func verifyAttestation(ctx context.Context, artifactPath string, additionalFlags
 
 	// Split the command into parts for exec.Command
 	cmdParts := strings.Fields(fullCmd)
-	cmd := exec.CommandContext(ctx, cmdParts[0], cmdParts[1:]...)
+	cmd := exec.CommandContext(ctx, cmdParts[0], cmdParts[1:]...) //nolint:gosec
 
 	// Force TTY output for gh attestation verify command
 	cmd.Env = append(os.Environ(), "GH_FORCE_TTY=1")
