@@ -45,7 +45,8 @@ archives:
   name_template: '{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
   format_overrides:
     - goos: darwin
-      format: zip
+      formats:
+        - zip
   files:
     - LICENSE
     - CREDITS
@@ -54,16 +55,15 @@ archives:
 -
   id: gh-setup-binary
   name_template: '{{ .Binary }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
-  format: binary
+  formats:
+    - binary
 checksum:
   name_template: 'checksums.txt'
-snapshot:
-  name_template: "{{ .Version }}-next"
 changelog:
 nfpms:
   - id: gh-setup-nfpms
     file_name_template: "{{ .ProjectName }}_{{ .Version }}-1_{{ .Arch }}"
-    builds:
+    ids:
       - gh-setup-linux
     homepage: https://github.com/k1LoW/gh-setup
     maintainer: Ken'ichiro Oyama <k1lowxb@gmail.com>
