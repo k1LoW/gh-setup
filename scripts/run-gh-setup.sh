@@ -19,6 +19,8 @@ checksum=${GH_SETUP_CHECKSUM}
 force=${GH_SETUP_FORCE}
 strict=${GH_SETUP_STRICT}
 skip_content_type_check=${GH_SETUP_SKIP_CONTENT_TYPE_CHECK}
+verify_attestation=${GH_SETUP_VERIFY_ATTESTATION}
+attestation_flags=${GH_SETUP_ATTESTATION_FLAGS}
 
 boolopts=""
 
@@ -34,4 +36,13 @@ if [ ! -z "${skip_content_type_check}" ]; then
     boolopts+=" --skip-content-type-check"
 fi
 
-${bin} --repo ${repo} --version=${version} --os=${os} --arch=${arch} --match=${match} --bin-dir=${bin_dir} --bin-match=${bin_match} --checksum=${checksum}${boolopts}
+if [ ! -z "${verify_attestation}" ]; then
+    boolopts+=" --verify-attestation"
+fi
+
+attestation_flags_opt=""
+if [ ! -z "${attestation_flags}" ]; then
+    attestation_flags_opt=" --attestation-flags=\"${attestation_flags}\""
+fi
+
+${bin} --repo ${repo} --version=${version} --os=${os} --arch=${arch} --match=${match} --bin-dir=${bin_dir} --bin-match=${bin_match} --checksum=${checksum}${boolopts}${attestation_flags_opt}

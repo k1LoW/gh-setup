@@ -51,6 +51,14 @@ inputs:
     description: "Skip check content-type of assets"
     default: ""
     required: false
+  verify-attestation:
+    description: "Enable attestation verification using 'gh attestation verify'"
+    default: ""
+    required: false
+  attestation-flags:
+    description: "Additional flags to pass to 'gh attestation verify'"
+    default: ""
+    required: false
   gh-setup-version:
     description: "Version of gh-setup"
     default: "v1.10.2"
@@ -81,4 +89,6 @@ runs:
         GH_SETUP_FORCE: ${{ inputs.force }}
         GH_SETUP_STRICT: ${{ inputs.strict }}
         GH_SETUP_SKIP_CONTENT_TYPE_CHECK: ${{ inputs.skip-content-type-check }}
+        GH_SETUP_VERIFY_ATTESTATION: ${{ inputs.verify-attestation }}
+        GH_SETUP_ATTESTATION_FLAGS: ${{ inputs.attestation-flags }}
         GH_SETUP_BIN: ${{ steps.install-gh-setup.outputs.bin }}
