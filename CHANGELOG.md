@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.11.0](https://github.com/k1LoW/gh-setup/compare/v1.10.2...v1.11.0) - 2025-04-17
+- chore(deps): bump the dependencies group with 2 updates by @dependabot in https://github.com/k1LoW/gh-setup/pull/139
+- Add attestation verification feature by @haya14busa in https://github.com/k1LoW/gh-setup/pull/141
+
 ## [v1.10.2](https://github.com/k1LoW/gh-setup/compare/v1.10.1...v1.10.2) - 2025-04-08
 - chore(deps): bump github.com/k1LoW/go-github-client/v67 from 67.0.13 to 67.0.16 in the dependencies group by @dependabot in https://github.com/k1LoW/gh-setup/pull/135
 - chore(deps): bump the dependencies group across 1 directory with 4 updates by @dependabot in https://github.com/k1LoW/gh-setup/pull/137
