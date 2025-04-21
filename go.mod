@@ -1,6 +1,6 @@
 module github.com/k1LoW/gh-setup
 
-go 1.23.6
+go 1.23.8
 
 require (
 	github.com/cli/go-gh/v2 v2.12.0
