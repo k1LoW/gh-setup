@@ -1,5 +1,10 @@
 # Changelog
 
+## [v1.11.2](https://github.com/k1LoW/gh-setup/compare/v1.11.1...v1.11.2) - 2025-05-30
+- chore(deps): bump the dependencies group across 1 directory with 3 updates by @dependabot in https://github.com/k1LoW/gh-setup/pull/146
+- chore(deps): bump the dependencies group with 2 updates by @dependabot in https://github.com/k1LoW/gh-setup/pull/148
+- chore(deps): bump github.com/cli/go-gh/v2 from 2.12.0 to 2.12.1 by @dependabot in https://github.com/k1LoW/gh-setup/pull/149
+
 ## [v1.11.1](https://github.com/k1LoW/gh-setup/compare/v1.11.0...v1.11.1) - 2025-04-21
 - chore(deps): bump the dependencies group with 2 updates by @dependabot in https://github.com/k1LoW/gh-setup/pull/143
 - chore(deps): bump github.com/k1LoW/go-github-client/v67 from 67.0.16 to 67.0.17 in the dependencies group by @dependabot in https://github.com/k1LoW/gh-setup/pull/142
