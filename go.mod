@@ -3,7 +3,7 @@ module github.com/k1LoW/gh-setup
 go 1.23.8
 
 require (
-	github.com/cli/go-gh/v2 v2.12.0
+	github.com/cli/go-gh/v2 v2.12.1
 	github.com/google/go-cmp v0.7.0
 	github.com/google/go-github/v67 v67.0.0
 	github.com/h2non/filetype v1.1.3
