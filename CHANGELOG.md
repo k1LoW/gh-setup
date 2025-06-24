@@ -1,5 +1,8 @@
 # Changelog
 
+## [v1.11.3](https://github.com/k1LoW/gh-setup/compare/v1.11.2...v1.11.3) - 2025-06-24
+- chore(deps): bump the dependencies group across 1 directory with 4 updates by @dependabot in https://github.com/k1LoW/gh-setup/pull/152
+
 ## [v1.11.2](https://github.com/k1LoW/gh-setup/compare/v1.11.1...v1.11.2) - 2025-05-30
 - chore(deps): bump the dependencies group across 1 directory with 3 updates by @dependabot in https://github.com/k1LoW/gh-setup/pull/146
 - chore(deps): bump the dependencies group with 2 updates by @dependabot in https://github.com/k1LoW/gh-setup/pull/148
