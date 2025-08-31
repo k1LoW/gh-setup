@@ -1,5 +1,12 @@
 # Changelog
 
+## [v1.11.3](https://github.com/k1LoW/gh-setup/compare/v1.11.2...v1.11.3) - 2025-08-31
+- chore(deps): bump the dependencies group across 1 directory with 4 updates by @dependabot[bot] in https://github.com/k1LoW/gh-setup/pull/152
+- chore(deps): bump github.com/k1LoW/go-github-client/v67 from 67.0.17 to 67.0.18 in the dependencies group by @dependabot[bot] in https://github.com/k1LoW/gh-setup/pull/154
+- chore(deps): bump docker/login-action from 3.4.0 to 3.5.0 in the dependencies group by @dependabot[bot] in https://github.com/k1LoW/gh-setup/pull/155
+- chore(deps): bump github.com/cli/go-gh/v2 from 2.12.1 to 2.12.2 in the dependencies group by @dependabot[bot] in https://github.com/k1LoW/gh-setup/pull/156
+- chore(deps): bump the dependencies group with 2 updates by @dependabot[bot] in https://github.com/k1LoW/gh-setup/pull/157
+
 ## [v1.11.2](https://github.com/k1LoW/gh-setup/compare/v1.11.1...v1.11.2) - 2025-05-30
 - chore(deps): bump the dependencies group across 1 directory with 3 updates by @dependabot in https://github.com/k1LoW/gh-setup/pull/146
 - chore(deps): bump the dependencies group with 2 updates by @dependabot in https://github.com/k1LoW/gh-setup/pull/148
