@@ -1,5 +1,8 @@
 # Changelog
 
+## [v1.11.4](https://github.com/k1LoW/gh-setup/compare/v1.11.3...v1.11.4) - 2025-09-01
+- chore(deps): bump k1LoW/gh-setup from 1.11.2 to 1.11.3 in the dependencies group by @dependabot[bot] in https://github.com/k1LoW/gh-setup/pull/158
+
 ## [v1.11.3](https://github.com/k1LoW/gh-setup/compare/v1.11.2...v1.11.3) - 2025-08-31
 - chore(deps): bump the dependencies group across 1 directory with 4 updates by @dependabot[bot] in https://github.com/k1LoW/gh-setup/pull/152
 - chore(deps): bump github.com/k1LoW/go-github-client/v67 from 67.0.17 to 67.0.18 in the dependencies group by @dependabot[bot] in https://github.com/k1LoW/gh-setup/pull/154
