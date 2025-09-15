@@ -1,4 +1,4 @@
-FROM golang:1-bullseye AS builder
+From golang:1 AS builder
 
 WORKDIR /workdir/
 COPY . /workdir/
@@ -9,7 +9,7 @@ RUN update-ca-certificates
 
 RUN make build
 
-FROM debian:bullseye-slim
+FROM debian:trixie-slim
 
 RUN apt-get update \
     && apt-get clean \
