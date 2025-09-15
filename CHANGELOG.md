@@ -1,5 +1,8 @@
 # Changelog
 
+## [v1.11.6](https://github.com/k1LoW/gh-setup/compare/v1.11.5...v1.11.6) - 2025-09-15
+- chore(deps): bump the dependencies group with 2 updates by @dependabot[bot] in https://github.com/k1LoW/gh-setup/pull/162
+
 ## [v1.11.5](https://github.com/k1LoW/gh-setup/compare/v1.11.4...v1.11.5) - 2025-09-15
 
 ## [v1.11.4](https://github.com/k1LoW/gh-setup/compare/v1.11.3...v1.11.4) - 2025-09-09
