@@ -1,5 +1,7 @@
 # Changelog
 
+## [v1.11.5](https://github.com/k1LoW/gh-setup/compare/v1.11.4...v1.11.5) - 2025-09-15
+
 ## [v1.11.4](https://github.com/k1LoW/gh-setup/compare/v1.11.3...v1.11.4) - 2025-09-09
 - chore(deps): bump k1LoW/gh-setup from 1.11.2 to 1.11.3 in the dependencies group by @dependabot[bot] in https://github.com/k1LoW/gh-setup/pull/158
 - chore(deps): bump github.com/spf13/cobra from 1.9.1 to 1.10.1 in the dependencies group by @dependabot[bot] in https://github.com/k1LoW/gh-setup/pull/160
