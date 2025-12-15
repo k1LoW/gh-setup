@@ -1,5 +1,14 @@
 # Changelog
 
+## [v1.11.6](https://github.com/k1LoW/gh-setup/compare/v1.11.5...v1.11.6) - 2025-12-15
+- chore(deps): bump the dependencies group with 2 updates by @dependabot[bot] in https://github.com/k1LoW/gh-setup/pull/162
+- chore: setup tagpr labels by @k1LoW in https://github.com/k1LoW/gh-setup/pull/167
+- chore(deps): bump github.com/k1LoW/go-github-client/v67 from 67.0.18 to 67.0.19 in the dependencies group by @dependabot[bot] in https://github.com/k1LoW/gh-setup/pull/166
+- chore(deps): bump docker/login-action from 3.5.0 to 3.6.0 in the dependencies group by @dependabot[bot] in https://github.com/k1LoW/gh-setup/pull/165
+- chore(deps): bump the dependencies group across 1 directory with 3 updates by @dependabot[bot] in https://github.com/k1LoW/gh-setup/pull/171
+- chore(deps): bump the dependencies group across 1 directory with 2 updates by @dependabot[bot] in https://github.com/k1LoW/gh-setup/pull/174
+- chore(deps): bump the dependencies group across 1 directory with 3 updates by @dependabot[bot] in https://github.com/k1LoW/gh-setup/pull/172
+
 ## [v1.11.5](https://github.com/k1LoW/gh-setup/compare/v1.11.4...v1.11.5) - 2025-09-15
 
 ## [v1.11.4](https://github.com/k1LoW/gh-setup/compare/v1.11.3...v1.11.4) - 2025-09-09
