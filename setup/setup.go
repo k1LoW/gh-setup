@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -60,10 +61,12 @@ func Bin(fsys fs.FS, opt *Option) (map[string]string, error) {
 				return nil
 			}
 		} else {
-			for _, i := range ignoreBinnameKeywords {
-				if strings.Contains(filepath.ToSlash(strings.ToLower(path)), filepath.ToSlash(strings.ToLower(i))) {
-					slog.Info("Skip", slog.String("Reason", "Matched the ignore filename keywords"), slog.String("path", path), slog.String("list", fmt.Sprintf("%v", ignoreBinnameKeywords)))
-					return nil
+			if !slices.Contains(allowedBinnameKeywords, filepath.Base(path)) {
+				for _, i := range ignoreBinnameKeywords {
+					if strings.Contains(filepath.Base(strings.ToLower(path)), filepath.Base(strings.ToLower(i))) {
+						slog.Info("Skip", slog.String("Reason", "Matched the ignore filename keywords"), slog.String("path", path), slog.String("list", fmt.Sprintf("%v", ignoreBinnameKeywords)))
+						return nil
+					}
 				}
 			}
 		}
@@ -116,6 +119,9 @@ var ignorePathKeywords = []string{
 	".yarn",
 	"/Library/",
 	"hostedtoolcache",
+}
+var allowedBinnameKeywords = []string{
+	"gocredits",
 }
 var ignoreBinnameKeywords = []string{
 	"CHANGELOG",
