@@ -1,5 +1,8 @@
 # Changelog
 
+## [v1.11.7](https://github.com/k1LoW/gh-setup/compare/v1.11.6...v1.11.7) - 2025-12-22
+- chore(deps): bump the dependencies group with 2 updates by @dependabot[bot] in https://github.com/k1LoW/gh-setup/pull/175
+
 ## [v1.11.6](https://github.com/k1LoW/gh-setup/compare/v1.11.5...v1.11.6) - 2025-12-15
 - chore(deps): bump the dependencies group with 2 updates by @dependabot[bot] in https://github.com/k1LoW/gh-setup/pull/162
 - chore: setup tagpr labels by @k1LoW in https://github.com/k1LoW/gh-setup/pull/167
