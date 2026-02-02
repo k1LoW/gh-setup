@@ -1,5 +1,12 @@
 # Changelog
 
+## [v1.11.7](https://github.com/k1LoW/gh-setup/compare/v1.11.6...v1.11.7) - 2026-02-02
+- chore(deps): bump the dependencies group with 2 updates by @dependabot[bot] in https://github.com/k1LoW/gh-setup/pull/175
+- chore(deps): bump Songmu/tagpr from 1.10.0 to 1.11.0 in the dependencies group by @dependabot[bot] in https://github.com/k1LoW/gh-setup/pull/177
+- chore(deps): bump the dependencies group with 2 updates by @dependabot[bot] in https://github.com/k1LoW/gh-setup/pull/178
+- chore(deps): bump the dependencies group with 2 updates by @dependabot[bot] in https://github.com/k1LoW/gh-setup/pull/179
+- chore(deps): bump the dependencies group with 2 updates by @dependabot[bot] in https://github.com/k1LoW/gh-setup/pull/180
+
 ## [v1.11.6](https://github.com/k1LoW/gh-setup/compare/v1.11.5...v1.11.6) - 2025-12-15
 - chore(deps): bump the dependencies group with 2 updates by @dependabot[bot] in https://github.com/k1LoW/gh-setup/pull/162
 - chore: setup tagpr labels by @k1LoW in https://github.com/k1LoW/gh-setup/pull/167
