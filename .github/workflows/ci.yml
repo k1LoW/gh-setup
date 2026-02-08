@@ -94,7 +94,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Set up gh-setup
-        uses: k1LoW/gh-setup@0f243b18b55c459d1a125e275884413e4bbaef0a # v1.11.6
+        uses: k1LoW/gh-setup@37dc37986ccadf532c61ca385342553333bbd648 # v1.11.7
         with:
           repo: cli/cli
           bin-match: bin/gh$
