@@ -150,11 +150,12 @@ func (c *client) getReleaseAssetsURLs(ctx context.Context, page int) ([]string, 
 }
 
 func (c *client) parseReleaseAssetsURLs(body string) []string {
+	prefix := fmt.Sprintf("https://github.com/%s/%s/releases/expanded_assets/", c.owner, c.repo)
 	urls := []string{}
 	// Iterate the already buffered body instead of bufio.Scanner, which fails on the
 	// >64KB inline script lines the GitHub WebUI embeds.
 	for line := range strings.Lines(body) {
-		if strings.Contains(line, fmt.Sprintf("https://github.com/%s/%s/releases/expanded_assets/", c.owner, c.repo)) {
+		if strings.Contains(line, prefix) {
 			splitted := strings.Split(line, `src="`)
 			if len(splitted) == 2 {
 				splitted2 := strings.Split(splitted[1], `"`)
