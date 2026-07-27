@@ -1,8 +1,6 @@
 package gh
 
 import (
-	"bufio"
-	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -148,11 +146,14 @@ func (c *client) getReleaseAssetsURLs(ctx context.Context, page int) ([]string, 
 	if err != nil {
 		return nil, err
 	}
-	scanner := bufio.NewScanner(bytes.NewReader(b))
-	scanner.Split(bufio.ScanLines)
+	return c.parseReleaseAssetsURLs(string(b)), nil
+}
+
+func (c *client) parseReleaseAssetsURLs(body string) []string {
 	urls := []string{}
-	for scanner.Scan() {
-		line := scanner.Text()
+	// Iterate the already buffered body instead of bufio.Scanner, which fails on the
+	// >64KB inline script lines the GitHub WebUI embeds.
+	for line := range strings.Lines(body) {
 		if strings.Contains(line, fmt.Sprintf("https://github.com/%s/%s/releases/expanded_assets/", c.owner, c.repo)) {
 			splitted := strings.Split(line, `src="`)
 			if len(splitted) == 2 {
@@ -161,10 +162,7 @@ func (c *client) getReleaseAssetsURLs(ctx context.Context, page int) ([]string, 
 			}
 		}
 	}
-	if err := scanner.Err(); err != nil {
-		return nil, err
-	}
-	return urls, nil
+	return urls
 }
 
 func (c *client) getReleaseAssetsViaURL(ctx context.Context, url string) ([]*releaseAsset, error) {
@@ -182,11 +180,14 @@ func (c *client) getReleaseAssetsViaURL(ctx context.Context, url string) ([]*rel
 	if err != nil {
 		return nil, err
 	}
-	scanner := bufio.NewScanner(bytes.NewReader(b))
-	scanner.Split(bufio.ScanLines)
+	return parseReleaseAssets(string(b)), nil
+}
+
+func parseReleaseAssets(body string) []*releaseAsset {
 	assets := []*releaseAsset{}
-	for scanner.Scan() {
-		line := scanner.Text()
+	// Iterate the already buffered body instead of bufio.Scanner, which fails on the
+	// >64KB inline script lines the GitHub WebUI embeds.
+	for line := range strings.Lines(body) {
 		if strings.Contains(line, "/download/") {
 			splitted := strings.Split(line, `href="`)
 			if len(splitted) == 2 {
@@ -201,10 +202,7 @@ func (c *client) getReleaseAssetsViaURL(ctx context.Context, url string) ([]*rel
 			}
 		}
 	}
-	if err := scanner.Err(); err != nil {
-		return nil, err
-	}
-	return assets, nil
+	return assets
 }
 
 func (c *client) getReleaseAssetsWithAPI(ctx context.Context, opt *AssetOption) ([]*releaseAsset, error) {
