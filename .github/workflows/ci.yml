@@ -32,7 +32,7 @@ jobs:
         run: make ci
 
       - name: Run octocov
-        uses: k1LoW/octocov-action@b3b6ee60482a667950f87553abf1df63217235d9 # v1.5.1
+        uses: k1LoW/octocov-action@a167dc0dee441b7ffc45e1b862ab55ec0d87f278 # v1.5.2
 
   job-run-test:
     name: Setup test
@@ -94,7 +94,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up gh-setup
-        uses: k1LoW/gh-setup@5134fd4fc448da9cca216b2298af4bee28a4eed2 # v1.11.8
+        uses: k1LoW/gh-setup@5fb38d34ea857e5a942b6fe10f1723e55055f6c0 # v1.11.9
         with:
           repo: cli/cli
           bin-match: bin/gh$
