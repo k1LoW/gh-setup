@@ -23,7 +23,7 @@ jobs:
           cache: true
 
       - name: Run lint
-        uses: reviewdog/action-golangci-lint@c76cceaaab89abe74e649d2e34c6c9adc26662d2 # v2.10.0
+        uses: reviewdog/action-golangci-lint@db65103266f304d8ac929ad6c0cd02d14f6837ba # v2.10.1
         with:
           fail_level: warning
           go_version_file: go.mod
@@ -94,7 +94,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up gh-setup
-        uses: k1LoW/gh-setup@5fb38d34ea857e5a942b6fe10f1723e55055f6c0 # v1.11.9
+        uses: k1LoW/gh-setup@75f7148db0c44bde69cf3ffb2e559dce1eb26f4b # v1.11.10
         with:
           repo: cli/cli
           bin-match: bin/gh$
