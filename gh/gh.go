@@ -40,6 +40,8 @@ var osDict = map[string][]string{
 var archDict = map[string][]string{
 	"amd64": {"amd64", "x86_64", "x64"},
 	"arm64": {"arm64", "aarch64"},
+	"386":   {"386", "i386", "i686", "ia32", "x86"},
+	"arm":   {"arm"},
 }
 
 var supportContentType = []string{
@@ -70,55 +72,73 @@ type AssetOption struct {
 	AttestationFlags     string // Additional flags for gh attestation verify
 }
 
-func GetReleaseAsset(ctx context.Context, owner, repo string, opt *AssetOption) (*releaseAsset, fs.FS, error) {
+type ResolvedAsset struct {
+	Asset   *releaseAsset
+	client  *client
+	options AssetOption
+}
+
+func ResolveReleaseAsset(ctx context.Context, owner, repo string, opt *AssetOption) (*ResolvedAsset, error) {
 	c, err := newClient(ctx, owner, repo)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	assets, err := c.getReleaseAssets(ctx, opt)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	a, err := detectAsset(assets, opt)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
-	b, err := c.downloadAsset(ctx, a)
-	if err != nil {
-		return nil, nil, err
-	}
-
+	r := &ResolvedAsset{Asset: a, client: c}
 	if opt != nil {
-		if err := checksum(b, opt.Checksum); err != nil {
-			return nil, nil, err
-		}
-
-		// Add attestation verification
-		if opt.VerifyAttestation {
-			// Create a temporary file for the downloaded asset
-			tmpFile, err := os.CreateTemp("", fmt.Sprintf("%s-%s-*", repo, a.Name))
-			if err != nil {
-				return nil, nil, fmt.Errorf("failed to create temp file for attestation verification: %w", err)
-			}
-			defer os.Remove(tmpFile.Name())
-			defer tmpFile.Close()
-
-			if _, err := tmpFile.Write(b); err != nil {
-				return nil, nil, fmt.Errorf("failed to write to temp file: %w", err)
-			}
-
-			// Verify attestation
-			if err := verifyAttestation(ctx, tmpFile.Name(), opt.AttestationFlags); err != nil {
-				return nil, nil, err
-			}
-		}
+		r.options = *opt
 	}
+	return r, nil
+}
 
-	fsys, err := makeFS(ctx, b, repo, a.Name, []string{a.ContentType, http.DetectContentType(b)})
+func GetReleaseAsset(ctx context.Context, owner, repo string, opt *AssetOption) (*releaseAsset, fs.FS, error) {
+	r, err := ResolveReleaseAsset(ctx, owner, repo, opt)
 	if err != nil {
 		return nil, nil, err
 	}
-	return a, fsys, nil
+	fsys, err := r.Materialize(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+	return r.Asset, fsys, nil
+}
+
+func (r *ResolvedAsset) Materialize(ctx context.Context) (fsys fs.FS, err error) {
+	a := r.Asset
+	b, err := r.client.downloadAsset(ctx, a)
+	if err != nil {
+		return nil, err
+	}
+
+	opt := &r.options
+	if err := checksum(b, opt.Checksum); err != nil {
+		return nil, err
+	}
+	if opt.VerifyAttestation {
+		tmpFile, err := os.CreateTemp("", "gh-setup-attestation-*")
+		if err != nil {
+			return nil, fmt.Errorf("failed to create temp file for attestation verification: %w", err)
+		}
+		defer func() { err = errors.Join(err, os.Remove(tmpFile.Name())) }()
+		if _, err := tmpFile.Write(b); err != nil {
+			return nil, fmt.Errorf("failed to write to temp file: %w", errors.Join(err, tmpFile.Close()))
+		}
+		if err := tmpFile.Close(); err != nil {
+			return nil, err
+		}
+		if err := verifyAttestation(ctx, tmpFile.Name(), opt.AttestationFlags); err != nil {
+			return nil, err
+		}
+	}
+
+	return makeFS(ctx, b, r.client.repo, a.Name, []string{a.ContentType, http.DetectContentType(b)})
 }
 
 // verifyAttestation verifies the attestation of an artifact using gh attestation verify.
@@ -128,20 +148,9 @@ func verifyAttestation(ctx context.Context, artifactPath string, additionalFlags
 		return fmt.Errorf("gh CLI not found: %w", err)
 	}
 
-	// Build the base command
-	baseCmd := fmt.Sprintf("gh attestation verify %s", artifactPath)
-
-	// Add any additional flags
-	fullCmd := baseCmd
-	if additionalFlags != "" {
-		fullCmd = fmt.Sprintf("%s %s", baseCmd, additionalFlags)
-	}
-
-	slog.Info("Running attestation verification", slog.String("command", fullCmd))
-
-	// Split the command into parts for exec.Command
-	cmdParts := strings.Fields(fullCmd)
-	cmd := exec.CommandContext(ctx, cmdParts[0], cmdParts[1:]...) //nolint:gosec
+	args := append([]string{"attestation", "verify", artifactPath}, strings.Fields(additionalFlags)...)
+	slog.Info("Running attestation verification", slog.Any("args", args))
+	cmd := exec.CommandContext(ctx, "gh", args...) //nolint:gosec
 
 	// Force TTY output for gh attestation verify command
 	cmd.Env = append(os.Environ(), "GH_FORCE_TTY=1")

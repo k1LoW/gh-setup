@@ -1,48 +1,46 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
-bin="${GH_SETUP_BIN}"
-token=${GH_SETUP_GITHUB_TOKEN}
-if [ -z "${token}" ]; then
-  token=${GITHUB_TOKEN}
-fi
-export GITHUB_TOKEN=${token}
+bin="${GH_SETUP_BIN:?}"
+export GITHUB_TOKEN="${GH_SETUP_GITHUB_TOKEN:-${GITHUB_TOKEN:-}}"
 
-repo=${GH_SETUP_REPO}
-version=${GH_SETUP_VERSION}
-os=${GH_SETUP_OS}
-arch=${GH_SETUP_ARCH}
-match=${GH_SETUP_MATCH}
-bin_dir=${GH_SETUP_BIN_DIR}
-bin_match=${GH_SETUP_BIN_MATCH}
-checksum=${GH_SETUP_CHECKSUM}
-force=${GH_SETUP_FORCE}
-strict=${GH_SETUP_STRICT}
-skip_content_type_check=${GH_SETUP_SKIP_CONTENT_TYPE_CHECK}
-verify_attestation=${GH_SETUP_VERIFY_ATTESTATION}
-attestation_flags=${GH_SETUP_ATTESTATION_FLAGS}
+args=(
+  "--repo=${GH_SETUP_REPO:-}"
+  "--version=${GH_SETUP_VERSION:-}"
+  "--os=${GH_SETUP_OS:-}"
+  "--arch=${GH_SETUP_ARCH:-}"
+  "--match=${GH_SETUP_MATCH:-}"
+  "--bin-dir=${GH_SETUP_BIN_DIR:-}"
+  "--bin-match=${GH_SETUP_BIN_MATCH:-}"
+  "--checksum=${GH_SETUP_CHECKSUM:-}"
+  "--attestation-flags=${GH_SETUP_ATTESTATION_FLAGS:-}"
+)
 
-boolopts=""
-
-if [ ! -z "${force}" ]; then
-    boolopts+=" --force"
+help="$("${bin}" --help)"
+if [[ -z "${GH_SETUP_BIN_DIR:-}" ]]; then
+  if ! grep -q -- '--tool-cache' <<< "${help}"; then
+    echo "The selected gh-setup-version does not support Runner Tool Cache. Select a release with --tool-cache support, or set bin-dir to opt out." >&2
+    exit 1
+  fi
+  args+=(--tool-cache)
 fi
 
-if [ ! -z "${strict}" ]; then
-    boolopts+=" --strict"
+if [[ -n "${GH_SETUP_FORCE:-}" && "${GH_SETUP_FORCE}" != "false" ]]; then
+  args+=(--force)
+fi
+if [[ -n "${GH_SETUP_STRICT:-}" && "${GH_SETUP_STRICT}" != "false" ]]; then
+  args+=(--strict)
+fi
+if [[ -n "${GH_SETUP_SKIP_CONTENT_TYPE_CHECK:-}" && "${GH_SETUP_SKIP_CONTENT_TYPE_CHECK}" != "false" ]]; then
+  args+=(--skip-content-type-check)
+fi
+if [[ -n "${GH_SETUP_VERIFY_ATTESTATION:-}" && "${GH_SETUP_VERIFY_ATTESTATION}" != "false" ]]; then
+  args+=(--verify-attestation)
 fi
 
-if [ ! -z "${skip_content_type_check}" ]; then
-    boolopts+=" --skip-content-type-check"
-fi
+"${bin}" "${args[@]}"
 
-if [ ! -z "${verify_attestation}" ]; then
-    boolopts+=" --verify-attestation"
+if [[ -n "${GH_SETUP_BIN_DIR:-}" && "${help}" != *"--tool-cache"* ]]; then
+  # Older releases do not register explicit installation directories.
+  printf '%s\n' "$(cd "${GH_SETUP_BIN_DIR}" && pwd)" >> "${GITHUB_PATH:?}"
 fi
-
-attestation_flags_opt=""
-if [ ! -z "${attestation_flags}" ]; then
-    attestation_flags_opt=" --attestation-flags=\"${attestation_flags}\""
-fi
-
-${bin} --repo ${repo} --version=${version} --os=${os} --arch=${arch} --match=${match} --bin-dir=${bin_dir} --bin-match=${bin_match} --checksum=${checksum}${boolopts}${attestation_flags_opt}

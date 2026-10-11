@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -21,6 +22,9 @@ type releaseAsset struct {
 	Name        string
 	ContentType string
 	DownloadURL string
+	Tag         string
+	UpdatedAt   string
+	Size        int
 }
 
 type client struct {
@@ -120,7 +124,11 @@ func (c *client) getReleaseAssetsWithoutAPI(ctx context.Context, opt *AssetOptio
 			return c.getReleaseAssetsViaURL(ctx, urls[0])
 		} else {
 			for _, url := range urls {
-				if strings.HasSuffix(url, opt.Version) {
+				tag, err := releaseTag(url)
+				if err != nil {
+					return nil, err
+				}
+				if tag == opt.Version {
 					return c.getReleaseAssetsViaURL(ctx, url)
 				}
 			}
@@ -142,6 +150,9 @@ func (c *client) getReleaseAssetsURLs(ctx context.Context, page int) ([]string, 
 		return nil, err
 	}
 	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("failed to get releases: %s", resp.Status)
+	}
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
@@ -166,8 +177,24 @@ func (c *client) parseReleaseAssetsURLs(body string) []string {
 	return urls
 }
 
-func (c *client) getReleaseAssetsViaURL(ctx context.Context, url string) ([]*releaseAsset, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+func releaseTag(rawURL string) (string, error) {
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		return "", err
+	}
+	_, tag, ok := strings.Cut(u.EscapedPath(), "/releases/expanded_assets/")
+	if !ok || tag == "" {
+		return "", fmt.Errorf("invalid release URL: %s", rawURL)
+	}
+	return url.PathUnescape(tag)
+}
+
+func (c *client) getReleaseAssetsViaURL(ctx context.Context, rawURL string) ([]*releaseAsset, error) {
+	tag, err := releaseTag(rawURL)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawURL, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -177,11 +204,18 @@ func (c *client) getReleaseAssetsViaURL(ctx context.Context, url string) ([]*rel
 		return nil, err
 	}
 	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("failed to get release assets: %s", resp.Status)
+	}
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
-	return parseReleaseAssets(string(b)), nil
+	assets := parseReleaseAssets(string(b))
+	for _, a := range assets {
+		a.Tag = tag
+	}
+	return assets, nil
 }
 
 func parseReleaseAssets(body string) []*releaseAsset {
@@ -230,6 +264,9 @@ func (c *client) getReleaseAssetsWithAPI(ctx context.Context, opt *AssetOption) 
 			Name:        a.GetName(),
 			ContentType: a.GetContentType(),
 			DownloadURL: a.GetBrowserDownloadURL(),
+			Tag:         r.GetTagName(),
+			UpdatedAt:   a.GetUpdatedAt().Format(time.RFC3339Nano),
+			Size:        a.GetSize(),
 		})
 	}
 	return assets, nil

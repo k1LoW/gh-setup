@@ -11,7 +11,7 @@ import (
 
 func TestMain(m *testing.M) {
 	os.Setenv("GH_CONFIG_DIR", "/tmp") // Disable reading credentials from config
-	m.Run()
+	os.Exit(m.Run())
 }
 
 func TestGetReleaseAsset(t *testing.T) {

@@ -53,32 +53,66 @@ jobs:
           go-version-file: go.mod
           cache: true
 
+      - name: Prepare source-built bootstrap cache
+        run: bash scripts/prepare-test-cache.sh
+        shell: bash
+
       - name: Run setup test
         run: |
           go run cmd/gh-setup/main.go --repo k1LoW/colr --version v1.1.1 --force
-          colr -v
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Get latest version
-        id: latest_version
-        run: |
-          echo -n 'version=' > $GITHUB_OUTPUT
-          gh release list --exclude-drafts --exclude-pre-releases --limit 1 | cut -f 1 >> $GITHUB_OUTPUT
-          cat $GITHUB_OUTPUT
+      - name: Run installed CLI
+        run: colr -v
         shell: bash
 
-      - name: Run setup as a action (1/2)
+      - name: Run setup as an action
         uses: ./
         with:
           repo: k1LoW/tbls
-          force: true
+          version: v1.84.0
           strict: true
-          gh-setup-version: ${{ steps.latest_version.outputs.version }}
+          gh-setup-version: source-test
 
-      - name: Run setup as a action (2/2)
-        run: tbls version
+      - name: Check installed cache
+        run: |
+          tbls version
+          binary="$(command -v tbls)"
+          cache_root="$(cd "$RUNNER_TOOL_CACHE" && pwd)"
+          [[ "$binary" == "$cache_root/"*"/1.84.0/"*"/bin/"* ]]
+          root="$(dirname "$(dirname "$binary")")"
+          test -f "${root}.complete"
+          test -f "${root}/gh-setup.json"
+          cp "${root}/gh-setup.json" "${RUNNER_TEMP}/tbls-manifest.json"
+          touch -t 202001010000 "$binary"
+          touch -r "$binary" "${RUNNER_TEMP}/tbls-install-time"
+        shell: bash
+
+      - name: Reuse setup cache without Force
+        uses: ./
+        with:
+          repo: k1LoW/tbls
+          version: v1.84.0
+          strict: true
+          gh-setup-version: source-test
+
+      - name: Check cache reuse
+        run: |
+          tbls version
+          binary="$(command -v tbls)"
+          root="$(dirname "$(dirname "$binary")")"
+          cmp "${root}/gh-setup.json" "${RUNNER_TEMP}/tbls-manifest.json"
+          test ! "$binary" -nt "${RUNNER_TEMP}/tbls-install-time"
+          test ! "$binary" -ot "${RUNNER_TEMP}/tbls-install-time"
+        shell: bash
+
+      - name: Exercise explicit directory opt-out
+        run: |
+          mkdir -p "${RUNNER_TEMP}/explicit-bin"
+          go run cmd/gh-setup/main.go --repo k1LoW/colr --version v1.1.1 --bin-dir="${RUNNER_TEMP}/explicit-bin"
+          test -f "${RUNNER_TEMP}/explicit-bin/colr" || test -f "${RUNNER_TEMP}/explicit-bin/colr.exe"
         shell: bash
 
   job-on-container-test:
@@ -93,21 +127,29 @@ jobs:
       - name: Check out source code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Set up gh-setup
-        uses: k1LoW/gh-setup@5fb38d34ea857e5a942b6fe10f1723e55055f6c0 # v1.11.9
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Prepare source-built bootstrap cache
+        run: bash scripts/prepare-test-cache.sh
+        shell: bash
+
+      - name: Set up GitHub CLI using asset and binary matches
+        uses: ./
         with:
           repo: cli/cli
           bin-match: bin/gh$
           match: tar.gz$
+          gh-setup-version: source-test
 
-      - name: Get latest version
-        id: latest_version
-        run: |
-          echo -n 'version=' > $GITHUB_OUTPUT
-          gh release list --limit 1 | cut -f 1 >> $GITHUB_OUTPUT
-          cat $GITHUB_OUTPUT
+      - name: Run installed GitHub CLI
+        run: gh version
+        shell: bash
 
-      - name: Run setup as a action (1/2)
+      - name: Run setup as an action
         uses: ./
         with:
           repo: k1LoW/tbls
@@ -115,10 +157,24 @@ jobs:
           os: linux
           arch: amd64
           checksum: 83f35a07fd2a00c2aa360a47edca6d261f5208186911977eff39097151fc57d5
-          force: true
           strict: true
-          gh-setup-version: ${{ steps.latest_version.outputs.version }}
+          gh-setup-version: source-test
 
-      - name: Run setup as a action (2/2)
-        run: tbls version
+      - name: Reuse verified setup cache
+        uses: ./
+        with:
+          repo: k1LoW/tbls
+          version: v1.84.0
+          os: linux
+          arch: amd64
+          checksum: 83f35a07fd2a00c2aa360a47edca6d261f5208186911977eff39097151fc57d5
+          strict: true
+          gh-setup-version: source-test
+
+      - name: Run installed binary
+        run: |
+          tbls version
+          binary="$(command -v tbls)"
+          [[ "$binary" == "$RUNNER_TOOL_CACHE/"*"/1.84.0/x64/bin/"* ]]
+          test -f "$(dirname "$(dirname "$binary")").complete"
         shell: bash

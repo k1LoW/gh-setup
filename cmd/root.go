@@ -23,9 +23,14 @@ package cmd
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
+	"path/filepath"
+	"regexp"
+	"slices"
 
 	"github.com/k1LoW/gh-setup/gh"
 	"github.com/k1LoW/gh-setup/setup"
@@ -37,9 +42,10 @@ import (
 var ownerrepo string
 
 var (
-	opt     = &gh.AssetOption{}
-	sOpt    = &setup.Option{}
-	verbose bool
+	opt       = &gh.AssetOption{}
+	sOpt      = &setup.Option{}
+	verbose   bool
+	toolCache bool
 )
 
 var rootCmd = &cobra.Command{
@@ -54,8 +60,20 @@ var rootCmd = &cobra.Command{
 			cmd.Printf("gh-setup version %s\n", version.Version)
 			return nil
 		}
-		ctx := context.Background()
 		setLogger(verbose)
+		ctx := cmd.Context()
+		actions := os.Getenv("GITHUB_ACTIONS") == "true"
+		cache := (actions || toolCache) && sOpt.BinDir == ""
+		if cache {
+			if err := setup.ValidateActionsEnvironment(); err != nil {
+				return err
+			}
+		}
+		for _, pattern := range []string{opt.Match, sOpt.BinMatch} {
+			if _, err := regexp.Compile(pattern); err != nil {
+				return err
+			}
+		}
 		host, owner, repo, err := gh.DetectHostOwnerRepo(ownerrepo)
 		if err != nil {
 			return err
@@ -64,24 +82,95 @@ var rootCmd = &cobra.Command{
 		os.Setenv("GH_HOST", host)
 		os.Unsetenv("GITHUB_API_URL")
 
-		a, fsys, err := gh.GetReleaseAsset(ctx, owner, repo, opt)
+		selection := setup.Selection{
+			Match: opt.Match, BinMatch: sOpt.BinMatch, OS: opt.OS, Arch: opt.Arch,
+			Strict: opt.Strict, SkipContentTypeCheck: opt.SkipContentTypeCheck,
+		}
+		assetOpt := *opt
+		if cache {
+			targetOS, targetArch, err := setup.RunnerTarget()
+			if err != nil {
+				return err
+			}
+			if assetOpt.OS == "" {
+				assetOpt.OS = targetOS
+			}
+			if assetOpt.Arch == "" {
+				assetOpt.Arch = targetArch
+			}
+		}
+		resolved, err := gh.ResolveReleaseAsset(ctx, owner, repo, &assetOpt)
 		if err != nil {
 			return err
 		}
+		a := resolved.Asset
 		cmd.Printf("Use %s\n", a.Name)
-		m, err := setup.Bin(fsys, sOpt)
+		asset, err := json.Marshal(a)
 		if err != nil {
 			return err
 		}
-		if len(m) == 0 {
-			return fmt.Errorf("setup failed: %s", a.Name)
+		cacheArch := ""
+		if cache {
+			cacheArch, err = setup.CacheArch(os.Getenv("RUNNER_ARCH"))
+			if err != nil {
+				return err
+			}
+		}
+		request := setup.CacheRequest{
+			Host: host, Owner: owner, Repo: repo, Tag: a.Tag, Arch: cacheArch,
+			Asset: string(asset), Selection: selection,
+			Verification: setup.Verification{
+				Checksum: opt.Checksum, VerifyAttestation: opt.VerifyAttestation,
+				AttestationFlags: opt.AttestationFlags,
+			},
+		}
+		result, err := installRelease(ctx, cache, request, sOpt, resolved.Materialize)
+		if err != nil {
+			return err
+		}
+		if actions || toolCache {
+			if err := setup.AddPath(result.BinDir); err != nil {
+				return err
+			}
+		}
+		if result.Hit {
+			cmd.Printf("Reuse tool cache: %s\n", result.BinDir)
 		}
 		cmd.Println("Setup binaries to executable path (PATH):")
-		for b, bp := range m {
-			cmd.Println(" ", b, "->", bp)
+		sources := make([]string, 0, len(result.Bins))
+		for source := range result.Bins {
+			sources = append(sources, source)
+		}
+		slices.Sort(sources)
+		for _, source := range sources {
+			cmd.Println(" ", source, "->", result.Bins[source])
 		}
 		return nil
 	},
+}
+
+func installRelease(ctx context.Context, cache bool, request setup.CacheRequest, options *setup.Option,
+	materialize func(context.Context) (fs.FS, error)) (*setup.CacheResult, error) {
+	if cache {
+		return setup.CacheBin(ctx, os.Getenv("RUNNER_TOOL_CACHE"), request, options, materialize)
+	}
+	fsys, err := materialize(ctx)
+	if err != nil {
+		return nil, err
+	}
+	bins, err := setup.Bin(fsys, options)
+	if err != nil {
+		return nil, err
+	}
+	if len(bins) == 0 {
+		return nil, fmt.Errorf("setup failed: no binaries found in release asset")
+	}
+	result := &setup.CacheResult{Bins: bins}
+	for _, bp := range bins {
+		result.BinDir = filepath.Dir(bp)
+		break
+	}
+	return result, nil
 }
 
 func Execute() {
@@ -116,6 +205,7 @@ func init() {
 	rootCmd.Flags().StringVarP(&opt.Arch, "arch", "A", "", "specify arch of asset")
 	rootCmd.Flags().StringVarP(&opt.Match, "match", "", "", "regexp to match asset name")
 	rootCmd.Flags().StringVarP(&sOpt.BinDir, "bin-dir", "", "", "bin directory for setup")
+	rootCmd.Flags().BoolVar(&toolCache, "tool-cache", false, "use Runner Tool Cache (automatic in GitHub Actions unless --bin-dir is set)")
 	rootCmd.Flags().StringVarP(&sOpt.BinMatch, "bin-match", "", "", "regexp to match bin path in asset")
 	rootCmd.Flags().StringVarP(&opt.Checksum, "checksum", "", "", "checksum of asset")
 	rootCmd.Flags().BoolVarP(&sOpt.Force, "force", "f", false, "enable force setup")
