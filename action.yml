@@ -28,7 +28,7 @@ inputs:
     default: ""
     required: false
   bin-dir:
-    description: "Executable path"
+    description: "Explicit executable directory (opts out of Runner Tool Cache)"
     default: ""
     required: false
   bin-match:
@@ -40,7 +40,7 @@ inputs:
     default: ""
     required: false
   force:
-    description: "Enable force setup"
+    description: "Reinstall even when a completed tool cache entry exists"
     default: ""
     required: false
   strict:
@@ -60,7 +60,7 @@ inputs:
     default: ""
     required: false
   gh-setup-version:
-    description: "Version of gh-setup"
+    description: "Version of gh-setup (automatic tool caching requires a release with --tool-cache support)"
     default: "v1.11.10"
     required: false
 runs:
@@ -68,13 +68,13 @@ runs:
   steps:
     -
       id: install-gh-setup
-      run: ${GITHUB_ACTION_PATH}/scripts/install-gh-setup.sh
+      run: '"${GITHUB_ACTION_PATH}/scripts/install-gh-setup.sh"'
       shell: bash
       env:
         GH_SETUP_GITHUB_TOKEN: ${{ inputs.github-token }}
         GH_SETUP_GH_SETUP_VERSION: ${{ inputs.gh-setup-version }}
     -
-      run: ${GITHUB_ACTION_PATH}/scripts/run-gh-setup.sh
+      run: '"${GITHUB_ACTION_PATH}/scripts/run-gh-setup.sh"'
       shell: bash
       env:
         GH_SETUP_GITHUB_TOKEN: ${{ inputs.github-token }}
