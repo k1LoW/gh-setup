@@ -90,12 +90,12 @@ jobs:
         shell: bash
         env:
           GH_SETUP_BIN: ./gh-setup-dev${{ runner.os == 'Windows' && '.exe' || '' }}
-          GH_SETUP_REPO: k1LoW/tbls
+          GH_SETUP_REPO: k1LoW/runn
           GH_SETUP_FORCE: "true"
           GH_SETUP_STRICT: "true"
 
       - name: Run setup as a action with gh-setup built from source (2/2)
-        run: tbls version
+        run: runn --version
         shell: bash
 
   job-on-container-test:
