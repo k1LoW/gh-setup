@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -eo pipefail
 
 token=${GH_SETUP_GITHUB_TOKEN}
 if [ -z "${token}" ]; then
@@ -8,10 +8,14 @@ fi
 repo="k1LoW/gh-setup"
 tag=${GH_SETUP_GH_SETUP_VERSION}
 if [ -z "${tag}" ]; then
-    tag="$(curl -sL -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${token}" https://api.github.com/repos/${repo}/releases/latest | grep tag_name | awk -F':' '{print $2}' | awk -F'\"' '{print $2}')"
+    tag="$(curl -sSL --fail --retry 5 -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${token}" https://api.github.com/repos/${repo}/releases/latest | grep tag_name | awk -F':' '{print $2}' | awk -F'\"' '{print $2}')"
 fi
 if [[ "${tag}" == "latest" ]]; then
-    tag="$(curl -sL -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${token}" https://api.github.com/repos/${repo}/releases/latest | grep tag_name | awk -F':' '{print $2}' | awk -F'\"' '{print $2}')"
+    tag="$(curl -sSL --fail --retry 5 -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${token}" https://api.github.com/repos/${repo}/releases/latest | grep tag_name | awk -F':' '{print $2}' | awk -F'\"' '{print $2}')"
+fi
+if [ -z "${tag}" ]; then
+    echo "failed to resolve the version of gh-setup" >&2
+    exit 1
 fi
 arch="$(uname -m)"
 
@@ -49,7 +53,7 @@ elif uname -a | grep Linux > /dev/null; then
 fi
 
 # download
-curl -sL -o ${bin} https://github.com/k1LoW/gh-setup/releases/download/${tag}/${exe}
-chmod +x ${bin}
-${bin} version
+curl -sSL --fail --retry 5 -o "${bin}" "https://github.com/k1LoW/gh-setup/releases/download/${tag}/${exe}"
+chmod +x "${bin}"
+"${bin}" version
 echo "bin=${bin}" >> ${GITHUB_OUTPUT}
