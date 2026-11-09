@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/google/go-github/v67/github"
@@ -29,8 +30,38 @@ func shouldRetry(ctx context.Context, status int, err error) bool {
 	return status == http.StatusRequestTimeout || status == http.StatusTooManyRequests || status >= http.StatusInternalServerError
 }
 
-func waitRetry(ctx context.Context, attempt int) error {
+// retryDelay returns how long to wait before the next attempt, honoring Retry-After (RFC 9110 Section 10.2.3).
+// When the server asks to wait longer than retryMaxInterval, it returns false instead of waiting less than asked,
+// because retrying earlier than requested only extends rate limiting.
+func retryDelay(attempt int, h http.Header) (time.Duration, bool) {
 	d := min(retryBaseInterval<<attempt, retryMaxInterval)
+	ra, ok := parseRetryAfter(h.Get("Retry-After"))
+	if !ok {
+		return d, true
+	}
+	if ra > retryMaxInterval {
+		return 0, false
+	}
+	return max(d, ra), true
+}
+
+func parseRetryAfter(v string) (time.Duration, bool) {
+	if v == "" {
+		return 0, false
+	}
+	if sec, err := strconv.Atoi(v); err == nil {
+		if sec < 0 {
+			return 0, false
+		}
+		return time.Duration(sec) * time.Second, true
+	}
+	if t, err := http.ParseTime(v); err == nil {
+		return max(time.Until(t), 0), true
+	}
+	return 0, false
+}
+
+func waitRetry(ctx context.Context, d time.Duration) error {
 	t := time.NewTimer(d)
 	defer t.Stop()
 	select {
@@ -52,12 +83,20 @@ func (c *client) do(req *http.Request) (*http.Response, error) {
 		if attempt >= maxRetries || !shouldRetry(ctx, status, err) {
 			return resp, err
 		}
+		var h http.Header
+		if resp != nil {
+			h = resp.Header
+		}
+		d, ok := retryDelay(attempt, h)
+		if !ok {
+			return resp, err
+		}
 		if resp != nil {
 			_, _ = io.Copy(io.Discard, resp.Body)
 			_ = resp.Body.Close()
 		}
-		slog.Info("Retry request", slog.String("url", req.URL.String()), slog.Int("status", status), slog.Int("attempt", attempt+1))
-		if err := waitRetry(ctx, attempt); err != nil {
+		slog.Info("Retry request", slog.String("url", req.URL.String()), slog.Int("status", status), slog.Int("attempt", attempt+1), slog.Duration("delay", d))
+		if err := waitRetry(ctx, d); err != nil {
 			return nil, err
 		}
 	}
@@ -70,14 +109,20 @@ func retryGitHub[T any](ctx context.Context, f func() (T, *github.Response, erro
 			return v, resp, nil
 		}
 		status := 0
-		if resp != nil {
+		var h http.Header
+		if resp != nil && resp.Response != nil {
 			status = resp.StatusCode
+			h = resp.Header
 		}
 		if attempt >= maxRetries || !shouldRetry(ctx, status, err) {
 			return v, resp, err
 		}
-		slog.Info("Retry GitHub API request", slog.Int("status", status), slog.Int("attempt", attempt+1), slog.String("error", err.Error()))
-		if err := waitRetry(ctx, attempt); err != nil {
+		d, ok := retryDelay(attempt, h)
+		if !ok {
+			return v, resp, err
+		}
+		slog.Info("Retry GitHub API request", slog.Int("status", status), slog.Int("attempt", attempt+1), slog.Duration("delay", d), slog.String("error", err.Error()))
+		if err := waitRetry(ctx, d); err != nil {
 			return v, resp, err
 		}
 	}

@@ -142,3 +142,70 @@ func TestRetryGitHub(t *testing.T) {
 		})
 	}
 }
+
+func TestRetryDelay(t *testing.T) {
+	base, maxi := retryBaseInterval, retryMaxInterval
+	retryBaseInterval, retryMaxInterval = time.Second, 16*time.Second
+	t.Cleanup(func() {
+		retryBaseInterval, retryMaxInterval = base, maxi
+	})
+	tests := []struct {
+		name       string
+		attempt    int
+		retryAfter string
+		want       time.Duration
+		wantRetry  bool
+	}{
+		{"exponential backoff without Retry-After", 2, "", 4 * time.Second, true},
+		{"backoff is capped", 10, "", 16 * time.Second, true},
+		{"Retry-After seconds longer than backoff", 0, "5", 5 * time.Second, true},
+		{"backoff longer than Retry-After seconds", 3, "2", 8 * time.Second, true},
+		{"Retry-After beyond the max interval gives up", 0, "60", 0, false},
+		{"Retry-After HTTP-date beyond the max interval gives up", 0, time.Now().Add(time.Hour).UTC().Format(http.TimeFormat), 0, false},
+		{"Retry-After HTTP-date in the past", 1, time.Now().Add(-time.Hour).UTC().Format(http.TimeFormat), 2 * time.Second, true},
+		{"invalid Retry-After is ignored", 1, "soon", 2 * time.Second, true},
+		{"negative Retry-After is ignored", 1, "-1", 2 * time.Second, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			h := http.Header{}
+			if tt.retryAfter != "" {
+				h.Set("Retry-After", tt.retryAfter)
+			}
+			got, ok := retryDelay(tt.attempt, h)
+			if ok != tt.wantRetry {
+				t.Errorf("got retry %v, want %v", ok, tt.wantRetry)
+			}
+			if got != tt.want {
+				t.Errorf("got %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestClientDoGivesUpOnLongRetryAfter(t *testing.T) {
+	shortenRetryInterval(t)
+	var requests atomic.Int32
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requests.Add(1)
+		w.Header().Set("Retry-After", "60")
+		w.WriteHeader(http.StatusTooManyRequests)
+	}))
+	t.Cleanup(ts.Close)
+	c := &client{hc: ts.Client()}
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, ts.URL, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	resp, err := c.do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusTooManyRequests {
+		t.Errorf("got status %d, want %d", resp.StatusCode, http.StatusTooManyRequests)
+	}
+	if got := requests.Load(); got != 1 {
+		t.Errorf("got %d requests, want 1", got)
+	}
+}
