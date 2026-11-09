@@ -10,7 +10,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-const maxRetries = 5
+const maxRetries = 3
 
 var (
 	retryBaseInterval = 1 * time.Second
