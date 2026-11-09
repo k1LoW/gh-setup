@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.12.0](https://github.com/k1LoW/gh-setup/compare/v1.11.10...v1.12.0) - 2026-11-09
+
+- chore(deps): bump the dependencies group across 1 directory with 4 updates by @dependabot[bot] in https://github.com/k1LoW/gh-setup/pull/217
+- chore(deps): bump the dependencies group across 1 directory with 3 updates by @dependabot[bot] in https://github.com/k1LoW/gh-setup/pull/218
+- fix: retry transient errors when downloading assets by @k1LoW in https://github.com/k1LoW/gh-setup/pull/222
+- chore(deps): bump the dependencies group with 2 updates by @dependabot[bot] in https://github.com/k1LoW/gh-setup/pull/220
+- ci: run the action scripts with gh-setup built from source by @k1LoW in https://github.com/k1LoW/gh-setup/pull/223
+
 ## [v1.11.10](https://github.com/k1LoW/gh-setup/compare/v1.11.9...v1.11.10) - 2026-09-28
 
 - ci: generate CREDITS with gocredits v1.0.0 from a make target by @k1LoW in https://github.com/k1LoW/gh-setup/pull/211
