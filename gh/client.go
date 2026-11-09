@@ -50,7 +50,9 @@ func newClient(ctx context.Context, owner, repo string) (*client, error) {
 	if err != nil {
 		return nil, err
 	}
-	if _, _, err := gc.Repositories.Get(ctx, owner, repo); err != nil {
+	if _, _, err := retryGitHub(ctx, func() (*github.Repository, *github.Response, error) {
+		return gc.Repositories.Get(ctx, owner, repo)
+	}); err != nil {
 		slog.Info("Authentication failed, access without credentials", slog.String("error", err.Error()), slog.String("endpoint", v3ep), slog.String("owner", owner), slog.String("repo", repo), slog.String("host_source", hostSource), slog.String("token_source", tokenSource))
 		return newNoAuthClient(ctx, owner, repo, v3ep)
 	}
@@ -137,7 +139,7 @@ func (c *client) getReleaseAssetsURLs(ctx context.Context, page int) ([]string, 
 		return nil, err
 	}
 	req.Header.Add("Accept", acceptHeader)
-	resp, err := c.hc.Do(req)
+	resp, err := c.do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -145,6 +147,13 @@ func (c *client) getReleaseAssetsURLs(ctx context.Context, page int) ([]string, 
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
+	}
+	// The WebUI responds 404 to a page beyond the last one, which means there are no more releases.
+	if resp.StatusCode == http.StatusNotFound {
+		return []string{}, nil
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("failed to get %s: %d", req.URL, resp.StatusCode)
 	}
 	return c.parseReleaseAssetsURLs(string(b)), nil
 }
@@ -172,7 +181,7 @@ func (c *client) getReleaseAssetsViaURL(ctx context.Context, url string) ([]*rel
 		return nil, err
 	}
 	req.Header.Add("Accept", acceptHeader)
-	resp, err := c.hc.Do(req)
+	resp, err := c.do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -180,6 +189,9 @@ func (c *client) getReleaseAssetsViaURL(ctx context.Context, url string) ([]*rel
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("failed to get %s: %d", req.URL, resp.StatusCode)
 	}
 	return parseReleaseAssets(string(b)), nil
 }
@@ -213,12 +225,16 @@ func (c *client) getReleaseAssetsWithAPI(ctx context.Context, opt *AssetOption) 
 		err error
 	)
 	if opt == nil || (opt.Version == "" || opt.Version == versionLatest) {
-		r, _, err = c.gc.Repositories.GetLatestRelease(ctx, c.owner, c.repo)
+		r, _, err = retryGitHub(ctx, func() (*github.RepositoryRelease, *github.Response, error) {
+			return c.gc.Repositories.GetLatestRelease(ctx, c.owner, c.repo)
+		})
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		r, _, err = c.gc.Repositories.GetReleaseByTag(ctx, c.owner, c.repo, opt.Version)
+		r, _, err = retryGitHub(ctx, func() (*github.RepositoryRelease, *github.Response, error) {
+			return c.gc.Repositories.GetReleaseByTag(ctx, c.owner, c.repo, opt.Version)
+		})
 		if err != nil {
 			return nil, err
 		}
@@ -256,7 +272,7 @@ func (c *client) downloadAssetWithoutAPI(ctx context.Context, a *releaseAsset) (
 		return nil, err
 	}
 	req.Header.Add("Accept", "application/octet-stream")
-	resp, err := c.hc.Do(req)
+	resp, err := c.do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -279,7 +295,7 @@ func (c *client) downloadAssetWithAPI(ctx context.Context, a *releaseAsset) ([]b
 		return nil, err
 	}
 	req.Header.Add("Accept", "application/octet-stream")
-	resp, err := c.hc.Do(req)
+	resp, err := c.do(req)
 	if err != nil {
 		return nil, err
 	}
